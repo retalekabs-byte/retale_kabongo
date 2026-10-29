@@ -1,0 +1,20 @@
+@kadea.auth({
+  title: 'Vérification e-mail — Kadea Chat',
+  headerCtaHref: route('session.create'),
+  headerCtaLabel: 'Se connecter',
+})
+  <h1 class="auth-title">Vérifie ton e-mail</h1>
+  <p class="auth-subtitle">
+    Un lien de confirmation a été envoyé. Ouvre-le pour activer ton compte avant de te
+    connecter.
+  </p>
+
+  <div class="auth-message">
+    Sans confirmation, la connexion est refusée. Pense à regarder aussi dans les spams.
+  </div>
+
+  <div class="auth-actions">
+    <button type="button" class="btn-primary auth-submit">Renvoyer l’e-mail</button>
+    <a href="{{ route('session.create') }}" class="btn-ghost">Retour à la connexion</a>
+  </div>
+@end

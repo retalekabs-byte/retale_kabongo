@@ -1,0 +1,16 @@
+@let(showNav = false)
+@let(ctaHref = $props.get('headerCtaHref'))
+@let(ctaLabel = $props.get('headerCtaLabel'))
+
+@kadea.shell({ title: $props.get('title') })
+  @include('partials/kadea/header')
+
+  <main class="auth-page">
+    @include('partials/kadea/auth_decor')
+    <div class="auth-card {{ $props.get('cardClass') }}">
+      {{{ await $slots.main() }}}
+    </div>
+  </main>
+
+  @include('partials/kadea/footer')
+@end

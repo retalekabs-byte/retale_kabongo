@@ -1,0 +1,23 @@
+@kadea.auth({
+  title: 'Réinitialiser le mot de passe — Kadea Chat',
+  headerCtaHref: route('session.create'),
+  headerCtaLabel: 'Se connecter',
+})
+  <h1 class="auth-title">Réinitialiser</h1>
+  <p class="auth-subtitle">
+    Indique ton e-mail : tu recevras un lien pour choisir un nouveau mot de passe.
+  </p>
+
+  <form class="auth-form" action="#" method="get">
+    <div class="auth-field">
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" />
+    </div>
+    <button type="button" class="btn-primary auth-submit">Envoyer le lien</button>
+  </form>
+
+  <p class="auth-footer">
+    Tu te souviens du mot de passe ?
+    <a href="{{ route('session.create') }}">Se connecter</a>
+  </p>
+@end

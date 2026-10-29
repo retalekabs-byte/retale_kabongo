@@ -1,0 +1,76 @@
+<aside class="chat-sidebar">
+  <div class="chat-sidebar-head">
+    @if(mode === 'profile')
+      <a href="{{ route('chat') }}" class="chat-brand-link">Kadea Chat</a>
+    @else
+      <h1>Kadea Chat</h1>
+    @end
+    <div class="flex items-center gap-1">
+      <a href="{{ route('chat') }}" class="chat-icon-btn" aria-label="Nouvelle conversation" title="Nouvelle conversation">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" d="M12 5v14M5 12h14" />
+        </svg>
+      </a>
+      @include('partials/kadea/theme_toggle')
+      <a
+        href="{{ route('profile') }}"
+        class="chat-icon-btn {{ mode === 'profile' ? 'is-active' : '' }}"
+        aria-label="Profil"
+        title="Profil"
+      >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 20a8 8 0 0116 0" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="chat-search">
+    <input type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation" />
+  </div>
+
+  <p class="chat-section-label">Conversations</p>
+
+  <nav class="chat-list" aria-label="Liste des conversations">
+    <a href="{{ mode === 'chat' ? '#' : route('chat') }}" class="chat-conv {{ mode === 'chat' ? 'is-active' : '' }}">
+      <div class="chat-avatar" aria-hidden="true">AM</div>
+      <div class="chat-conv-meta">
+        <div class="chat-conv-top">
+          <span class="chat-conv-name">Amina Mbuyi</span>
+          <span class="chat-conv-time">14:22</span>
+        </div>
+        <p class="chat-conv-preview">On se voit demain pour le projet ?</p>
+      </div>
+    </a>
+    <a href="{{ mode === 'chat' ? '#' : route('chat') }}" class="chat-conv">
+      <div class="chat-avatar chat-avatar--group" aria-hidden="true">KD</div>
+      <div class="chat-conv-meta">
+        <div class="chat-conv-top">
+          <span class="chat-conv-name">Promo Kadea</span>
+          <span class="chat-conv-time">Hier</span>
+        </div>
+        <p class="chat-conv-preview">Joel : Les slides sont prêts</p>
+      </div>
+    </a>
+    <a href="{{ mode === 'chat' ? '#' : route('chat') }}" class="chat-conv">
+      <div class="chat-avatar" aria-hidden="true">JK</div>
+      <div class="chat-conv-meta">
+        <div class="chat-conv-top">
+          <span class="chat-conv-name">Joel Kabongo</span>
+          <span class="chat-conv-time">Lun.</span>
+        </div>
+        <p class="chat-conv-preview">Merci pour le retour !</p>
+      </div>
+    </a>
+    <a href="{{ mode === 'chat' ? '#' : route('chat') }}" class="chat-conv">
+      <div class="chat-avatar chat-avatar--group" aria-hidden="true">DV</div>
+      <div class="chat-conv-meta">
+        <div class="chat-conv-top">
+          <span class="chat-conv-name">Dev Team</span>
+          <span class="chat-conv-time">Sam.</span>
+        </div>
+        <p class="chat-conv-preview">Tu : Push sur main ce soir</p>
+      </div>
+    </a>
+  </nav>
+</aside>

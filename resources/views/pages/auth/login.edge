@@ -1,49 +1,33 @@
-@layouts.auth()
-  <h1 class="auth__title">Welcome back</h1>
-  <p class="auth__sub">Sign in to continue building.</p>
-  @form({
-    route: 'session.store',
-    method: 'POST',
-    class: 'auth__form',
-    'x-data': '{ submitting: false }',
-    'x-on:submit': 'submitting = true',
-  })
-    @field.root({ name: 'email' })
-      @!field.label({ text: 'Email' })
-      @!input.control({
-        type: 'email',
-        autocomplete: 'username',
-        placeholder: 'you@example.com',
-      })
-      @!field.error()
-    @end
-    @field.root({ name: 'password' })
-      @!field.label({ text: 'Password' })
-      @!input.control({
-        type: 'password',
-        autocomplete: 'current-password',
-        placeholder: '••••••••',
-      })
-      @!field.error()
-    @end
-    @!button({
-      text: 'Sign in',
-      type: 'submit',
-      block: true,
-      style: 'margin-top: 4px;',
-      'x-bind:disabled': 'submitting',
-      'x-text': "submitting ? 'One moment…' : 'Sign in'",
-    })
-  @end
+@kadea.auth({
+  title: 'Connexion — Kadea Chat',
+  headerCtaHref: route('new_account.create'),
+  headerCtaLabel: 'Créer un compte',
+})
+  <h1 class="auth-title">Bon retour</h1>
+  <p class="auth-subtitle">Connecte-toi pour retrouver tes conversations privées et de groupe.</p>
 
-  <p class="auth__foot">
-    
+  <form class="auth-form" action="{{ route('session.store') }}" method="post">
+    {{ csrfField() }}
+    <div class="auth-field">
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" />
+    </div>
+    <div class="auth-field">
+      <label for="password">Mot de passe</label>
+      <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+    </div>
+    <div class="auth-row">
+      <label class="auth-check">
+        <input type="checkbox" name="remember" />
+        Se souvenir de moi
+      </label>
+      <a href="{{ route('password.reset') }}">Mot de passe oublié ?</a>
+    </div>
+    <button type="submit" class="btn-primary auth-submit">Se connecter</button>
+  </form>
 
-    New here?
-
-
-    @link({ route: 'new_account.create', class: 'il' })
-      Create an account
-    @end
+  <p class="auth-footer">
+    Pas encore de compte ?
+    <a href="{{ route('new_account.create') }}">Créer un compte</a>
   </p>
 @end

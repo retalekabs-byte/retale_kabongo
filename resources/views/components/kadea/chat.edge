@@ -1,0 +1,12 @@
+@let(mode = $props.get('chatMode') || 'chat')
+
+@kadea.shell({
+  title: $props.get('title'),
+  bodyClass: $props.get('bodyClass') || 'chat-body',
+})
+  <div class="chat-app" id="chat-app">
+    @include('partials/kadea/chat_sidebar')
+    {{{ await $slots.main() }}}
+  </div>
+  <script src="/js/kadea-ui.js"></script>
+@end

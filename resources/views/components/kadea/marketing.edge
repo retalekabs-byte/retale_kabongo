@@ -1,0 +1,17 @@
+@let(showNav = true)
+@let(ctaHref = route('new_account.create'))
+@let(ctaLabel = 'Créer un compte')
+
+@kadea.shell({ title: $props.get('title') })
+  @include('partials/kadea/header')
+
+  {{{ await $slots.main() }}}
+
+  @include('partials/kadea/footer')
+
+  <a href="#" class="back-top" aria-label="Retour en haut">
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6" />
+    </svg>
+  </a>
+@end

@@ -1,0 +1,61 @@
+@kadea.chat({
+  title: 'Profil — Kadea Chat',
+  bodyClass: 'chat-body',
+  chatMode: 'profile',
+})
+  <section class="chat-main" aria-label="Mon profil">
+    <header class="chat-main-head">
+      <a href="{{ route('chat') }}" class="chat-icon-btn md:hidden" aria-label="Retour aux conversations">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <div class="min-w-0 flex-1">
+        <h2>Mon profil</h2>
+      </div>
+      <a href="{{ route('session.create') }}" class="chat-icon-btn" aria-label="Déconnexion" title="Déconnexion">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+        </svg>
+      </a>
+    </header>
+
+    <div class="chat-profile">
+      <div class="chat-profile-card">
+        <div class="chat-avatar chat-profile-avatar" aria-hidden="true">RK</div>
+        <p class="chat-profile-name">Retale Kabongo</p>
+        <p class="chat-profile-email">retale@exemple.com</p>
+      </div>
+
+      <form class="chat-profile-form" action="#" method="get">
+        <div class="auth-field">
+          <label for="name">Nom</label>
+          <input id="name" name="name" type="text" value="Retale Kabongo" required autocomplete="name" />
+        </div>
+        <div class="auth-field">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" value="retale@exemple.com" required autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label for="avatar">Avatar</label>
+          <input id="avatar" name="avatar" type="file" accept="image/*" />
+        </div>
+        <div class="auth-field">
+          <label for="password">Nouveau mot de passe</label>
+          <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+        <div class="auth-field">
+          <label for="passwordConfirmation">Confirmer le mot de passe</label>
+          <input
+            id="passwordConfirmation"
+            name="passwordConfirmation"
+            type="password"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+        </div>
+        <button type="button" class="btn-primary auth-submit">Enregistrer</button>
+      </form>
+    </div>
+  </section>
+@end
