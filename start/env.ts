@@ -33,5 +33,17 @@ export default await Env.create(new URL('../', import.meta.url), {
   MAIL_MAILER: Env.schema.enum(['brevo'] as const),
   MAIL_FROM_NAME: Env.schema.string(),
   MAIL_FROM_ADDRESS: Env.schema.string(),
-  BREVO_API_KEY: Env.schema.string()
+  BREVO_API_KEY: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the database
+  |----------------------------------------------------------
+  */
+  DB_CONNECTION: Env.schema.enum(['sqlite', 'pg'] as const),
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string.optional(),
+  DB_DATABASE: Env.schema.string(),
 })
