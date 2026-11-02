@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import transmit from '@adonisjs/transmit/services/main'
 import Conversation from '#models/conversation'
 import Message from '#models/message'
 import Conversations from '#services/conversations'
@@ -15,14 +16,24 @@ export default class MessagesController {
     }
 
     const { body } = await request.validateUsing(sendMessageValidator)
-    await Message.create({
+    const message = await Message.create({
       conversationId: conversation.id,
       userId: user.id,
       body,
     })
+    await message.load('user')
 
     conversation.updatedAt = DateTime.now()
     await conversation.save()
+
+    transmit.broadcast(`conversations/${conversation.id}`, {
+      type: 'created',
+      id: message.id,
+      body: message.body,
+      author: message.user.fullName,
+      userId: message.userId,
+      time: message.createdAt.toFormat('HH:mm'),
+    })
 
     return response.redirect().toRoute('chat.show', { id: conversation.id })
   }
@@ -53,6 +64,19 @@ export default class MessagesController {
 
     message.deletedAt = DateTime.now()
     await message.save()
+
+    const latest = await Message.query()
+      .where('conversationId', conversation.id)
+      .whereNull('deletedAt')
+      .orderBy('createdAt', 'desc')
+      .first()
+
+    transmit.broadcast(`conversations/${conversation.id}`, {
+      type: 'deleted',
+      id: message.id,
+      preview: latest?.body || 'Aucun message',
+      time: latest ? Conversations.formatWhen(latest.createdAt) : '',
+    })
 
     return response.redirect().toRoute('chat.show', { id: conversation.id })
   }

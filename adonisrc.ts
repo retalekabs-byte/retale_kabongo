@@ -69,6 +69,7 @@ export default defineConfig({
   preloads: [
     () => import('#start/routes'),
     () => import('#start/kernel'),
+    () => import('#start/transmit'),
     () => import('#start/validator'),
     () => import('#start/view'),
   ],

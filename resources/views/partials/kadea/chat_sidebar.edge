@@ -33,7 +33,7 @@
 
   <nav class="chat-list" aria-label="Liste des conversations">
     @each(item in conversations)
-      <a href="{{ route('chat.show', { id: item.id }) }}" class="chat-conv {{ activeId === item.id ? 'is-active' : '' }}">
+      <a href="{{ route('chat.show', { id: item.id }) }}" class="chat-conv {{ activeId === item.id ? 'is-active' : '' }}" data-conversation-id="{{ item.id }}">
         @if(item.avatar)
           <img src="{{ item.avatar }}" alt="" class="chat-avatar" />
         @else

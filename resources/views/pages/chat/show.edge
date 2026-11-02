@@ -25,7 +25,7 @@
 
       <div class="chat-messages">
         @each(message in messages)
-          <div class="chat-bubble {{ message.mine ? 'chat-bubble--out' : 'chat-bubble--in' }}">
+          <div class="chat-bubble {{ message.mine ? 'chat-bubble--out' : 'chat-bubble--in' }}" data-message-id="{{ message.id }}">
             <span class="chat-bubble-author">{{ message.author }}</span>
             {{ message.body }}
             <time>{{ message.time }}</time>
