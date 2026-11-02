@@ -918,6 +918,41 @@ body.theme-dark .chat-icon-btn {
   margin-bottom: 0.5rem;
 }
 
+img.chat-profile-avatar,
+img.chat-avatar {
+  object-fit: cover;
+}
+
+.chat-empty {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.chat-list-empty {
+  padding: 0.5rem 0.25rem 1rem;
+}
+
+.chat-flash {
+  margin: 0.75rem 1rem 0;
+}
+
+.chat-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid #e8eaf2;
+}
+
+.chat-person-btn {
+  margin-left: auto;
+  width: auto;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+}
+
 .chat-profile-name {
   margin: 0;
   font-size: 1.1rem;
