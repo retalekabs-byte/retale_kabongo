@@ -42,6 +42,10 @@ router
     router.get('/chat/new', [controllers.Conversations, 'create']).as('conversations.create')
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
     router.get('/chat/:id', [controllers.Conversations, 'show']).as('chat.show')
+    router.post('/chat/:id/messages', [controllers.Messages, 'store']).as('messages.store')
+    router
+      .post('/chat/:id/messages/:messageId/delete', [controllers.Messages, 'destroy'])
+      .as('messages.destroy')
     router.get('/profile', [controllers.Profiles, 'show']).as('profile')
     router.post('/profile', [controllers.Profiles, 'update']).as('profile.update')
     router.on('/dashboard').render('pages/dashboard').as('dashboard')

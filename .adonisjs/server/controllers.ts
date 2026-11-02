@@ -10,4 +10,5 @@ export const controllers = {
   PasswordResets: () => import('#controllers/password_resets_controller'),
   Profiles: () => import('#controllers/profiles_controller'),
   Conversations: () => import('#controllers/conversations_controller'),
+  Messages: () => import('#controllers/messages_controller'),
 }

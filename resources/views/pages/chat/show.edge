@@ -26,17 +26,30 @@
       <div class="chat-messages">
         @each(message in messages)
           <div class="chat-bubble {{ message.mine ? 'chat-bubble--out' : 'chat-bubble--in' }}">
+            <span class="chat-bubble-author">{{ message.author }}</span>
             {{ message.body }}
             <time>{{ message.time }}</time>
+            @if(message.mine)
+              <form action="{{ route('messages.destroy', { id: conversation.id, messageId: message.id }) }}" method="post">
+                {{ csrfField() }}
+                <button type="submit" class="chat-bubble-delete">Supprimer</button>
+              </form>
+            @end
           </div>
         @else
           <p class="chat-empty">Aucun message pour le moment.</p>
         @end
       </div>
 
-      <form class="chat-composer" action="#" method="get" onsubmit="return false;">
-        <input type="text" name="body" placeholder="Écrire un message…" aria-label="Message" autocomplete="off" disabled />
-        <button type="button" class="chat-send" aria-label="Envoyer" disabled>
+      @let(bodyErrors = flashMessages.get('inputErrorsBag', {}).body || [])
+      @each(error in bodyErrors)
+        <p class="chat-composer-error">{{ error }}</p>
+      @end
+
+      <form class="chat-composer" action="{{ route('messages.store', { id: conversation.id }) }}" method="post">
+        {{ csrfField() }}
+        <input type="text" name="body" value="{{ old('body') || '' }}" placeholder="Écrire un message…" aria-label="Message" autocomplete="off" required maxlength="5000" />
+        <button type="submit" class="chat-send" aria-label="Envoyer">
           <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
           </svg>

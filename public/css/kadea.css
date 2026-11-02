@@ -742,6 +742,35 @@ body {
   text-align: right;
 }
 
+.chat-bubble-author {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.chat-bubble-delete {
+  display: block;
+  margin-top: 0.15rem;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+  font: inherit;
+  font-size: 0.65rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.chat-composer-error {
+  margin: 0;
+  padding: 0.45rem 1.1rem 0;
+  color: #b42318;
+  font-size: 0.8rem;
+}
+
 .chat-composer {
   display: flex;
   align-items: center;
