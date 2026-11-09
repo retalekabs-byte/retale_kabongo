@@ -83,7 +83,10 @@ export default class MessagesController {
 
   private async writableConversation(id: number, userId: number) {
     if (!Number.isInteger(id)) return null
-    const conversation = await Conversation.query().where('id', id).where('type', 'private').first()
+    const conversation = await Conversation.query()
+      .where('id', id)
+      .whereIn('type', ['private', 'group'])
+      .first()
     if (!conversation || !(await Conversations.isMember(conversation.id, userId))) return null
     return conversation
   }

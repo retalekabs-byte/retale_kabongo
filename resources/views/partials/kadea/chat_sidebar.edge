@@ -35,9 +35,9 @@
     @each(item in conversations)
       <a href="{{ route('chat.show', { id: item.id }) }}" class="chat-conv {{ activeId === item.id ? 'is-active' : '' }}" data-conversation-id="{{ item.id }}">
         @if(item.avatar)
-          <img src="{{ item.avatar }}" alt="" class="chat-avatar" />
+          <img src="{{ item.avatar }}" alt="" class="chat-avatar {{ item.group ? 'chat-avatar--group' : '' }}" />
         @else
-          <div class="chat-avatar" aria-hidden="true">{{ item.initials }}</div>
+          <div class="chat-avatar {{ item.group ? 'chat-avatar--group' : '' }}" aria-hidden="true">{{ item.initials }}</div>
         @end
         <div class="chat-conv-meta">
           <div class="chat-conv-top">

@@ -42,6 +42,11 @@ router
     router.get('/chat', [controllers.Conversations, 'index']).as('chat')
     router.get('/chat/new', [controllers.Conversations, 'create']).as('conversations.create')
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
+    router.get('/chat/groups/new', [controllers.Groups, 'create']).as('groups.create')
+    router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
+    router.get('/chat/:id/members', [controllers.Groups, 'members']).as('groups.members')
+    router.post('/chat/:id/members', [controllers.Groups, 'add']).as('groups.add')
+    router.post('/chat/:id/members/:userId/remove', [controllers.Groups, 'remove']).as('groups.remove')
     router.get('/chat/:id', [controllers.Conversations, 'show']).as('chat.show')
     router.post('/chat/:id/messages', [controllers.Messages, 'store']).as('messages.store')
     router

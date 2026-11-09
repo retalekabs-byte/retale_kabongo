@@ -11,3 +11,13 @@ export const searchUsersValidator = vine.create({
 export const sendMessageValidator = vine.create({
   body: vine.string().trim().minLength(1).maxLength(5000),
 })
+
+export const createGroupValidator = vine.create({
+  name: vine.string().trim().minLength(1).maxLength(255),
+  avatar: vine
+    .file({
+      size: '2mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    })
+    .optional(),
+})

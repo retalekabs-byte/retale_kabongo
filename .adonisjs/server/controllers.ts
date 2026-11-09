@@ -11,4 +11,5 @@ export const controllers = {
   Profiles: () => import('#controllers/profiles_controller'),
   Conversations: () => import('#controllers/conversations_controller'),
   Messages: () => import('#controllers/messages_controller'),
+  Groups: () => import('#controllers/groups_controller'),
 }

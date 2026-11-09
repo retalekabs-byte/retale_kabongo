@@ -10,6 +10,7 @@ export type ConversationListItem = {
   name: string
   initials: string
   avatar: string | null
+  group: boolean
   preview: string
   time: string
 }
@@ -20,10 +21,7 @@ export default class Conversations {
     const ids = memberships.map((row) => row.conversationId)
     if (ids.length === 0) return []
 
-    const conversations = await Conversation.query()
-      .whereIn('id', ids)
-      .where('type', 'private')
-      .preload('members')
+    const conversations = await Conversation.query().whereIn('id', ids).preload('members')
 
     const latest = await this.latestMessages(conversations.map((row) => row.id))
 
@@ -32,12 +30,15 @@ export default class Conversations {
         const peer = conversation.members.find((member) => member.id !== user.id)
         const message = latest.get(conversation.id)
         const stamp = message?.createdAt ?? conversation.updatedAt ?? conversation.createdAt
+        const group = conversation.type === 'group'
+        const name = group ? conversation.name || 'Groupe' : peer?.fullName || 'Conversation'
 
         return {
           id: conversation.id,
-          name: peer?.fullName || 'Conversation',
-          initials: peer?.initials || '?',
-          avatar: peer?.avatar ?? null,
+          name,
+          initials: group ? this.initialsFrom(name) : peer?.initials || '?',
+          avatar: group ? conversation.avatar : (peer?.avatar ?? null),
+          group,
           preview: message?.body || 'Aucun message',
           time: this.formatWhen(stamp),
           sort: stamp.toMillis(),
@@ -100,6 +101,52 @@ export default class Conversations {
       await trx.rollback()
       throw error
     }
+  }
+
+  static initialsFrom(name: string) {
+    const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2)
+    const letters = parts.map((part) => part.charAt(0)).join('')
+    return (letters || '?').toUpperCase()
+  }
+
+  static async createGroup(user: User, name: string, others: User[], avatar: string | null) {
+    const trx = await db.transaction()
+    try {
+      const conversation = new Conversation()
+      conversation.useTransaction(trx)
+      conversation.type = 'group'
+      conversation.name = name
+      conversation.avatar = avatar
+      conversation.createdBy = user.id
+      await conversation.save()
+
+      const joinedAt = DateTime.now()
+      await ConversationMember.createMany(
+        [
+          { conversationId: conversation.id, userId: user.id, role: 'admin', joinedAt },
+          ...others.map((member) => ({
+            conversationId: conversation.id,
+            userId: member.id,
+            role: 'member',
+            joinedAt,
+          })),
+        ],
+        { client: trx }
+      )
+
+      await trx.commit()
+      return conversation
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
+
+  static async membership(conversationId: number, userId: number) {
+    return ConversationMember.query()
+      .where('conversationId', conversationId)
+      .where('userId', userId)
+      .first()
   }
 
   static async isMember(conversationId: number, userId: number) {

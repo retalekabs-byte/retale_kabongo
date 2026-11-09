@@ -982,6 +982,25 @@ img.chat-avatar {
   font-size: 0.85rem;
 }
 
+.chat-person-btn--quiet {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font: inherit;
+}
+
+.chat-group-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.25rem 0;
+}
+
+.chat-search--panel {
+  margin: 0.5rem 0 0;
+}
+
 .chat-profile-name {
   margin: 0;
   font-size: 1.1rem;

@@ -52,7 +52,7 @@ export default class ConversationsController {
     const user = auth.user!
     const conversation = await Conversation.query()
       .where('id', params.id)
-      .where('type', 'private')
+      .whereIn('type', ['private', 'group'])
       .preload('members')
       .first()
 
@@ -62,6 +62,8 @@ export default class ConversationsController {
     }
 
     const peer = conversation.members.find((member) => member.id !== user.id) || null
+    const heading =
+      conversation.type === 'group' ? conversation.name || 'Groupe' : peer?.fullName || 'Conversation'
     const rows = await Message.query()
       .where('conversationId', conversation.id)
       .whereNull('deletedAt')
@@ -69,9 +71,10 @@ export default class ConversationsController {
       .orderBy('createdAt', 'asc')
 
     return view.render('pages/chat/show', {
-      title: `${peer?.fullName || 'Conversation'} — Kadea Chat`,
+      title: `${heading} — Kadea Chat`,
       conversations: await Conversations.listFor(user),
       conversation,
+      heading,
       peer,
       messages: rows.map((message) => ({
         id: message.id,

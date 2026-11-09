@@ -19,6 +19,11 @@ export type ScannedRoutes = {
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.store': { paramsTuple?: []; params?: {} }
+    'groups.create': { paramsTuple?: []; params?: {} }
+    'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.add': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.remove': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'messageId': ParamValue} }
@@ -40,6 +45,8 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
+    'groups.create': { paramsTuple?: []; params?: {} }
+    'groups.members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -55,6 +62,8 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
+    'groups.create': { paramsTuple?: []; params?: {} }
+    'groups.members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -67,6 +76,9 @@ export type ScannedRoutes = {
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'conversations.store': { paramsTuple?: []; params?: {} }
+    'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.add': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.remove': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'messageId': ParamValue} }
     'profile.update': { paramsTuple?: []; params?: {} }
