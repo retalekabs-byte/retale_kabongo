@@ -1,6 +1,7 @@
 import { unlink } from 'node:fs/promises'
 import { randomBytes } from 'node:crypto'
 import app from '@adonisjs/core/services/app'
+import UserBlock from '#models/user_block'
 import Conversations from '#services/conversations'
 import { profileValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -8,8 +9,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class ProfilesController {
   async show({ view, auth }: HttpContext) {
     const user = auth.user!
+    const blocks = await UserBlock.query().where('blockerId', user.id).preload('blocked').orderBy('id', 'desc')
     return view.render('pages/chat/profile', {
       user,
+      blocks,
       conversations: await Conversations.listFor(user),
     })
   }

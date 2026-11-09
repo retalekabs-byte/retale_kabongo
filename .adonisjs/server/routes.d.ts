@@ -27,6 +27,8 @@ export type ScannedRoutes = {
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'messageId': ParamValue} }
+    'blocks.store': { paramsTuple?: []; params?: {} }
+    'blocks.destroy': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
     'profile': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
@@ -81,6 +83,8 @@ export type ScannedRoutes = {
     'groups.remove': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'messageId': ParamValue} }
+    'blocks.store': { paramsTuple?: []; params?: {} }
+    'blocks.destroy': { paramsTuple: [ParamValue]; params: {'userId': ParamValue} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }

@@ -1,6 +1,7 @@
 import Conversation from '#models/conversation'
 import Message from '#models/message'
 import User from '#models/user'
+import Blocks from '#services/blocks'
 import Conversations from '#services/conversations'
 import { searchUsersValidator, startConversationValidator } from '#validators/conversation'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -25,6 +26,7 @@ export default class ConversationsController {
     return view.render('pages/chat/new', {
       conversations: await Conversations.listFor(user),
       people,
+      blockedIds: await Blocks.relatedIds(user.id),
       query: q || '',
     })
   }
@@ -41,6 +43,11 @@ export default class ConversationsController {
     const other = await User.query().where('id', userId).whereNotNull('emailVerifiedAt').first()
     if (!other) {
       session.flash('error', 'Cette personne est introuvable.')
+      return response.redirect().toRoute('conversations.create')
+    }
+
+    if (await Blocks.between(user.id, other.id)) {
+      session.flash('error', 'Un blocage empêche d’ouvrir cette conversation privée.')
       return response.redirect().toRoute('conversations.create')
     }
 
@@ -64,6 +71,10 @@ export default class ConversationsController {
     const peer = conversation.members.find((member) => member.id !== user.id) || null
     const heading =
       conversation.type === 'group' ? conversation.name || 'Groupe' : peer?.fullName || 'Conversation'
+    const blocked =
+      conversation.type === 'private' && peer ? await Blocks.between(user.id, peer.id) : false
+    const blockedByMe =
+      conversation.type === 'private' && peer ? Boolean(await Blocks.mine(user.id, peer.id)) : false
     const rows = await Message.query()
       .where('conversationId', conversation.id)
       .whereNull('deletedAt')
@@ -76,6 +87,8 @@ export default class ConversationsController {
       conversation,
       heading,
       peer,
+      blocked,
+      blockedByMe,
       messages: rows.map((message) => ({
         id: message.id,
         body: message.body,

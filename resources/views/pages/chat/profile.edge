@@ -72,6 +72,25 @@
         </div>
         <button type="submit" class="btn-primary auth-submit">Enregistrer</button>
       </form>
+
+      <div class="chat-profile-form">
+        <p class="chat-section-label">Personnes bloquées</p>
+        @each(block in blocks)
+          <div class="chat-person">
+            <div class="chat-avatar" aria-hidden="true">{{ block.blocked.initials }}</div>
+            <div class="chat-conv-meta">
+              <span class="chat-conv-name">{{ block.blocked.fullName }}</span>
+              <p class="chat-conv-preview">{{ block.blocked.email }}</p>
+            </div>
+            <form action="{{ route('blocks.destroy', { userId: block.blockedId }) }}" method="post">
+              {{ csrfField() }}
+              <button type="submit" class="chat-person-btn chat-person-btn--quiet">Débloquer</button>
+            </form>
+          </div>
+        @else
+          <p class="chat-conv-preview">Personne n’est bloqué.</p>
+        @end
+      </div>
     </div>
   </section>
 @end

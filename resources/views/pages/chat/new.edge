@@ -28,16 +28,22 @@
         <p class="chat-empty">Saisis un nom ou un e-mail dans la recherche.</p>
       @else
         @each(person in people)
-          <form class="chat-person" action="{{ route('conversations.store') }}" method="post">
-            {{ csrfField() }}
-            <input type="hidden" name="userId" value="{{ person.id }}" />
+          <div class="chat-person">
             <div class="chat-avatar" aria-hidden="true">{{ person.initials }}</div>
             <div class="chat-conv-meta">
               <span class="chat-conv-name">{{ person.fullName }}</span>
               <p class="chat-conv-preview">{{ person.email }}</p>
             </div>
-            <button type="submit" class="btn-primary chat-person-btn">Discuter</button>
-          </form>
+            @if(blockedIds.includes(person.id))
+              <span class="chat-person-btn chat-person-btn--quiet">Bloqué</span>
+            @else
+              <form action="{{ route('conversations.store') }}" method="post">
+                {{ csrfField() }}
+                <input type="hidden" name="userId" value="{{ person.id }}" />
+                <button type="submit" class="btn-primary chat-person-btn">Discuter</button>
+              </form>
+            @end
+          </div>
         @else
           <p class="chat-empty">Aucune personne trouvée.</p>
         @end

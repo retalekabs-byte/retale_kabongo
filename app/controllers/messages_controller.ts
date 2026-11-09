@@ -2,6 +2,8 @@ import { DateTime } from 'luxon'
 import transmit from '@adonisjs/transmit/services/main'
 import Conversation from '#models/conversation'
 import Message from '#models/message'
+import Blocks from '#services/blocks'
+import ConversationMember from '#models/conversation_member'
 import Conversations from '#services/conversations'
 import { sendMessageValidator } from '#validators/conversation'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -13,6 +15,11 @@ export default class MessagesController {
     if (!conversation) {
       session.flash('error', 'Tu n’as pas accès à cette conversation.')
       return response.redirect().toRoute('chat')
+    }
+
+    if (conversation.type === 'private' && (await this.privateIsBlocked(conversation.id, user.id))) {
+      session.flash('error', 'Un blocage empêche d’envoyer un message privé.')
+      return response.redirect().toRoute('chat.show', { id: conversation.id })
     }
 
     const { body } = await request.validateUsing(sendMessageValidator)
@@ -89,5 +96,15 @@ export default class MessagesController {
       .first()
     if (!conversation || !(await Conversations.isMember(conversation.id, userId))) return null
     return conversation
+  }
+
+  private async privateIsBlocked(conversationId: number, userId: number) {
+    const peer = await ConversationMember.query()
+      .where('conversationId', conversationId)
+      .whereNot('userId', userId)
+      .first()
+
+    if (!peer) return false
+    return Blocks.between(userId, peer.userId)
   }
 }

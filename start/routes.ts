@@ -52,6 +52,8 @@ router
     router
       .post('/chat/:id/messages/:messageId/delete', [controllers.Messages, 'destroy'])
       .as('messages.destroy')
+    router.post('/blocks', [controllers.Blocks, 'store']).as('blocks.store')
+    router.post('/blocks/:userId/delete', [controllers.Blocks, 'destroy']).as('blocks.destroy')
     router.get('/profile', [controllers.Profiles, 'show']).as('profile')
     router.post('/profile', [controllers.Profiles, 'update']).as('profile.update')
     router.on('/dashboard').render('pages/dashboard').as('dashboard')

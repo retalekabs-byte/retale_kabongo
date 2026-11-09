@@ -12,4 +12,5 @@ export const controllers = {
   Conversations: () => import('#controllers/conversations_controller'),
   Messages: () => import('#controllers/messages_controller'),
   Groups: () => import('#controllers/groups_controller'),
+  Blocks: () => import('#controllers/blocks_controller'),
 }
