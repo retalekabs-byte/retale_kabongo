@@ -337,6 +337,22 @@
     })
   }
 
+  var peerInfoBtn = document.getElementById('btn-peer-info')
+  var peerInfoPop = document.getElementById('peer-info-pop')
+  if (peerInfoBtn && peerInfoPop) {
+    peerInfoBtn.addEventListener('click', function () {
+      peerInfoPop.hidden = !peerInfoPop.hidden
+    })
+    document.addEventListener('click', function (event) {
+      if (peerInfoPop.hidden) return
+      if (peerInfoPop.contains(event.target) || peerInfoBtn.contains(event.target)) return
+      peerInfoPop.hidden = true
+    })
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') peerInfoPop.hidden = true
+    })
+  }
+
   document.addEventListener('click', function (event) {
     var more = event.target.closest('.chat-bubble-more')
     var row = more ? more.closest('.chat-row') : null

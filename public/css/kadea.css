@@ -697,6 +697,7 @@ body {
 }
 
 .chat-main-head {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -867,6 +868,11 @@ body {
   padding: 0.45rem 1.1rem 0;
   color: #b42318;
   font-size: 0.8rem;
+  text-align: center;
+}
+
+.chat-composer-error--blocked {
+  margin-bottom: 1.6rem;
 }
 
 .chat-composer {
@@ -1295,6 +1301,53 @@ img.chat-avatar {
   width: auto;
   padding: 0.55rem 0.9rem;
   font-size: 0.85rem;
+}
+
+.chat-info {
+  position: relative;
+}
+
+.chat-info-pop {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 20;
+  width: 16rem;
+}
+
+.chat-info-pop[hidden] {
+  display: none;
+}
+
+.chat-info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 1rem 0.85rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+  text-align: center;
+}
+
+.chat-info-avatar {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.chat-info-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.chat-info-email {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  word-break: break-all;
 }
 
 .chat-text-btn {

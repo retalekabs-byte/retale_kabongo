@@ -22,18 +22,41 @@
           <h2>{{ heading }}</h2>
         </div>
         @if(conversation.type === 'private' && peer)
-          @if(blockedByMe)
-            <form action="{{ route('blocks.destroy', { userId: peer.id }) }}" method="post">
-              {{ csrfField() }}
-              <button type="submit" class="chat-text-btn">Débloquer</button>
-            </form>
-          @else
-            <form action="{{ route('blocks.store') }}" method="post">
-              {{ csrfField() }}
-              <input type="hidden" name="userId" value="{{ peer.id }}" />
-              <button type="submit" class="chat-text-btn">Bloquer</button>
-            </form>
-          @end
+          <div class="chat-info">
+            <button type="button" class="chat-icon-btn" id="btn-peer-info" aria-label="Informations" title="Informations">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path stroke-linecap="round" d="M12 11v6" />
+                <circle cx="12" cy="7.5" r="0.8" fill="currentColor" stroke="none" />
+              </svg>
+            </button>
+            <div id="peer-info-pop" class="chat-info-pop" hidden>
+              <div class="chat-info-card">
+                @if(peer.avatar)
+                  <img src="{{ peer.avatar }}" alt="" class="chat-avatar chat-info-avatar" />
+                @else
+                  <div class="chat-avatar chat-info-avatar" aria-hidden="true">{{ peer.initials }}</div>
+                @end
+                <p class="chat-info-name">{{ peer.fullName }}</p>
+                <p class="chat-info-email">{{ peer.email }}</p>
+                @if(blocked)
+                  <p class="chat-pop-hint">Les messages privés sont coupés.</p>
+                @end
+                @if(blockedByMe)
+                  <form action="{{ route('blocks.destroy', { userId: peer.id }) }}" method="post">
+                    {{ csrfField() }}
+                    <button type="submit" class="chat-text-btn">Débloquer</button>
+                  </form>
+                @else
+                  <form action="{{ route('blocks.store') }}" method="post">
+                    {{ csrfField() }}
+                    <input type="hidden" name="userId" value="{{ peer.id }}" />
+                    <button type="submit" class="chat-text-btn">Bloquer</button>
+                  </form>
+                @end
+              </div>
+            </div>
+          </div>
         @end
         @if(conversation.type === 'group')
           <a href="{{ route('groups.members', { id: conversation.id }) }}" class="chat-icon-btn" aria-label="Membres" title="Membres">
@@ -82,9 +105,11 @@
         <p class="chat-composer-error">{{ error }}</p>
       @end
 
-      @if(blocked)
-        <p class="chat-composer-error">Les messages privés sont coupés tant qu’un blocage existe.</p>
-      @else
+      @if(blockedByMe)
+        <p class="chat-composer-error chat-composer-error--blocked">Vous avez bloqué cette personne</p>
+      @end
+
+      @if(!blocked)
         <form class="chat-composer" action="{{ route('messages.store', { id: conversation.id }) }}" method="post">
           {{ csrfField() }}
           <input type="text" name="body" value="{{ old('body') || '' }}" placeholder="Écrire un message…" aria-label="Message" autocomplete="off" required maxlength="5000" />
