@@ -47,6 +47,7 @@
         <div class="auth-field">
           <label for="fullName">Nom</label>
           <input id="fullName" name="fullName" type="text" value="{{ old('fullName') || user.fullName }}" required autocomplete="name" />
+          @kadea.field_error({ name: 'fullName' })
         </div>
         <div class="auth-field">
           <label for="email">E-mail</label>
@@ -55,10 +56,12 @@
         <div class="auth-field">
           <label for="avatar">Avatar</label>
           <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
+          @kadea.field_error({ name: 'avatar' })
         </div>
         <div class="auth-field">
           <label for="password">Nouveau mot de passe</label>
           <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" />
+          @kadea.field_error({ name: 'password' })
         </div>
         <div class="auth-field">
           <label for="passwordConfirmation">Confirmer le mot de passe</label>

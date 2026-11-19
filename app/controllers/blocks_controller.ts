@@ -1,11 +1,12 @@
 import User from '#models/user'
 import UserBlock from '#models/user_block'
+import { memberIdValidator } from '#validators/conversation'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class BlocksController {
   async store({ request, auth, response, session }: HttpContext) {
     const user = auth.user!
-    const userId = Number(request.input('userId'))
+    const { userId } = await request.validateUsing(memberIdValidator)
     if (!Number.isInteger(userId) || userId === user.id) {
       session.flash('error', 'Tu ne peux pas te bloquer.')
       return response.redirect().back()

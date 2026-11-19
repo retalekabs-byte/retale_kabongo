@@ -1,0 +1,5 @@
+@let(field = $props.get('name'))
+@let(errors = flashMessages.get('inputErrorsBag', {})[field] || [])
+@each(message in errors)
+  <span class="auth-field-error">{{ message }}</span>
+@end

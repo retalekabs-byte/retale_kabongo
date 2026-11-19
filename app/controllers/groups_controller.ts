@@ -5,7 +5,7 @@ import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import User from '#models/user'
 import Conversations from '#services/conversations'
-import { createGroupValidator, searchUsersValidator } from '#validators/conversation'
+import { createGroupValidator, memberIdValidator, searchUsersValidator } from '#validators/conversation'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class GroupsController {
@@ -31,8 +31,15 @@ export default class GroupsController {
 
   async store({ request, response, session, auth }: HttpContext) {
     const user = auth.user!
-    const { name, avatar } = await request.validateUsing(createGroupValidator)
-    const memberIds = this.idList(request.input('members')).filter((id) => id !== user.id)
+    const avatarFile = request.file('avatar')
+    const payload: { name: string; members: number[]; avatar?: typeof avatarFile } = {
+      name: request.input('name'),
+      members: this.idList(request.input('members')).filter((id) => id !== user.id),
+    }
+    if (avatarFile) payload.avatar = avatarFile
+    const { name, members: memberIds, avatar } = await request.validateUsing(createGroupValidator, {
+      data: payload,
+    })
     const others = memberIds.length
       ? await User.query().whereIn('id', memberIds).whereNotNull('emailVerifiedAt')
       : []
@@ -75,7 +82,7 @@ export default class GroupsController {
       return response.redirect().toRoute('chat')
     }
 
-    const userId = Number(request.input('userId'))
+    const { userId } = await request.validateUsing(memberIdValidator)
     const other = await User.query().where('id', userId).whereNotNull('emailVerifiedAt').first()
     if (!other || other.id === user.id) {
       session.flash('error', 'Cette personne est introuvable.')

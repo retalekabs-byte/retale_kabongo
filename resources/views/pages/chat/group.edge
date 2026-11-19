@@ -25,7 +25,9 @@
       @end
       <div class="auth-field">
         <label for="name">Nom du groupe</label>
-        <input id="name" name="name" type="text" value="{{ name }}" required maxlength="255" />
+        <input id="name" name="name" type="text" value="{{ old('name') || name }}" required maxlength="255" />
+        @kadea.field_error({ name: 'name' })
+        @kadea.field_error({ name: 'members' })
       </div>
       <div class="auth-field">
         <label for="avatar">Photo, optionnelle</label>

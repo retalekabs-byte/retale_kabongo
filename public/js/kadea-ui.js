@@ -28,6 +28,18 @@
     })
   }
 
+  document.querySelectorAll('form').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      var button = form.querySelector('[type="submit"]')
+      if (!button || button.getAttribute('data-loading')) return
+      button.setAttribute('data-loading', '1')
+      window.setTimeout(function () {
+        button.disabled = true
+        if (button.classList.contains('auth-submit')) button.textContent = 'Envoi…'
+      }, 0)
+    })
+  })
+
   if (!app || !back) return
   if (window.matchMedia('(max-width: 900px)').matches) {
     app.classList.remove('show-list')
