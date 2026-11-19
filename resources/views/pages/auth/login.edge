@@ -11,12 +11,12 @@
     <div class="auth-field">
       <label for="email">E-mail</label>
       <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" value="{{ old('email') || '' }}" />
-      @kadea.field_error({ name: 'email' })
+      @!kadea.fieldError({ name: 'email' })
     </div>
     <div class="auth-field">
       <label for="password">Mot de passe</label>
       <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
-      @kadea.field_error({ name: 'password' })
+      @!kadea.fieldError({ name: 'password' })
     </div>
     <div class="auth-row">
       <label class="auth-check">

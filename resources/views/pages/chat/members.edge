@@ -21,10 +21,10 @@
 
     <div class="chat-messages">
       @if(flashMessages?.has('success'))
-        <div class="auth-message chat-flash">{{ flashMessages.get('success') }}</div>
+        <div class="auth-message auth-message--success chat-flash" role="status">{{ flashMessages.get('success') }}</div>
       @end
       @if(flashMessages?.has('error'))
-        <div class="auth-message chat-flash">{{ flashMessages.get('error') }}</div>
+        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
       @end
 
       @each(member in members)

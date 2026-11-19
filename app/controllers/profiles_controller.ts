@@ -23,7 +23,11 @@ export default class ProfilesController {
       await request.validateUsing(profileValidator)
 
     if ((password || passwordConfirmation) && password !== passwordConfirmation) {
+      session.flashExcept(['password', 'passwordConfirmation', '_csrf'])
       session.flash('error', 'Les deux mots de passe ne correspondent pas.')
+      session.flash('inputErrorsBag', {
+        passwordConfirmation: ['Retape le même mot de passe.'],
+      })
       return response.redirect().back()
     }
 

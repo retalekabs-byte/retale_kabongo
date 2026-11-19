@@ -26,8 +26,8 @@
       <div class="auth-field">
         <label for="name">Nom du groupe</label>
         <input id="name" name="name" type="text" value="{{ old('name') || name }}" required maxlength="255" />
-        @kadea.field_error({ name: 'name' })
-        @kadea.field_error({ name: 'members' })
+        @!kadea.fieldError({ name: 'name' })
+        @!kadea.fieldError({ name: 'members' })
       </div>
       <div class="auth-field">
         <label for="avatar">Photo, optionnelle</label>
@@ -38,7 +38,7 @@
 
     <div class="chat-messages">
       @if(flashMessages?.has('error'))
-        <div class="auth-message chat-flash">{{ flashMessages.get('error') }}</div>
+        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
       @end
 
       @each(member in selected)

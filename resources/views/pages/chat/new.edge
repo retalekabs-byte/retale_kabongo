@@ -21,7 +21,7 @@
 
     <div class="chat-messages">
       @if(flashMessages?.has('error'))
-        <div class="auth-message chat-flash">{{ flashMessages.get('error') }}</div>
+        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
       @end
 
       @if(!query)

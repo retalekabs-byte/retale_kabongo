@@ -28,6 +28,12 @@
     })
   }
 
+  var firstInvalid = document.querySelector('.auth-field:has(.auth-field-error) input, .auth-field:has(.auth-field-error) textarea')
+  if (firstInvalid) {
+    firstInvalid.setAttribute('aria-invalid', 'true')
+    firstInvalid.focus()
+  }
+
   document.querySelectorAll('form').forEach(function (form) {
     form.addEventListener('submit', function () {
       var button = form.querySelector('[type="submit"]')

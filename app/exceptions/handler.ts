@@ -1,3 +1,4 @@
+import { errors as authErrors } from '@adonisjs/auth'
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
@@ -34,6 +35,21 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof authErrors.E_INVALID_CREDENTIALS) {
+      const message = 'E-mail ou mot de passe incorrect.'
+      ctx.session.flashExcept(['_csrf', '_method', 'password', 'password_confirmation'])
+      ctx.session.flash('error', message)
+      ctx.session.flash('inputErrorsBag', {
+        email: ['Vérifie l’adresse e-mail.'],
+        password: ['Vérifie le mot de passe, ou réinitialise-le.'],
+      })
+      return ctx.response.redirect().back()
+    }
+
+    if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS) {
+      error.message = 'Ta session a expiré. Reconnecte-toi.'
+    }
+
     return super.handle(error, ctx)
   }
 
