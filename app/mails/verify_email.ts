@@ -1,11 +1,12 @@
 import { BaseMail } from '@adonisjs/mail'
-import type User from '#models/user'
+
+type Recipient = { email: string; fullName: string }
 
 export default class VerifyEmail extends BaseMail {
   subject = 'Confirme ton adresse — Kadea Chat'
 
   constructor(
-    private user: User,
+    private user: Recipient,
     private url: string
   ) {
     super()

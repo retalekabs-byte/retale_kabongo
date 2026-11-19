@@ -18,6 +18,24 @@ export default class ConversationsController {
     })
   }
 
+  async people({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+    const { q } = await request.validateUsing(searchUsersValidator, { data: request.qs() })
+    const blocked = new Set(await Blocks.relatedIds(user.id))
+    const people = await this.search(user.id, q || '')
+
+    return response.json(
+      people.map((person) => ({
+        id: person.id,
+        fullName: person.fullName,
+        email: person.email,
+        initials: person.initials,
+        avatar: person.avatar,
+        blocked: blocked.has(person.id),
+      }))
+    )
+  }
+
   async create({ view, auth, request }: HttpContext) {
     const user = auth.user!
     const { q } = await request.validateUsing(searchUsersValidator, { data: request.qs() })
@@ -37,18 +55,18 @@ export default class ConversationsController {
 
     if (userId === user.id) {
       session.flash('error', 'Tu ne peux pas ouvrir une conversation avec toi-même.')
-      return response.redirect().toRoute('conversations.create')
+      return response.redirect().toRoute('chat')
     }
 
     const other = await User.query().where('id', userId).whereNotNull('emailVerifiedAt').first()
     if (!other) {
       session.flash('error', 'Cette personne est introuvable.')
-      return response.redirect().toRoute('conversations.create')
+      return response.redirect().toRoute('chat')
     }
 
     if (await Blocks.between(user.id, other.id)) {
       session.flash('error', 'Un blocage empêche d’ouvrir cette conversation privée.')
-      return response.redirect().toRoute('conversations.create')
+      return response.redirect().toRoute('chat')
     }
 
     const conversation = await Conversations.findOrCreatePrivate(user, other)
@@ -100,14 +118,19 @@ export default class ConversationsController {
   }
 
   private search(userId: number, q: string) {
-    const term = `%${q}%`
-    return User.query()
+    const query = User.query()
       .whereNot('id', userId)
       .whereNotNull('emailVerifiedAt')
-      .where((query) => {
-        query.whereILike('fullName', term).orWhereILike('email', term)
-      })
       .orderBy('fullName', 'asc')
-      .limit(10)
+      .limit(20)
+
+    if (q) {
+      const term = `%${q}%`
+      query.where((builder) => {
+        builder.whereILike('fullName', term).orWhereILike('email', term)
+      })
+    }
+
+    return query
   }
 }

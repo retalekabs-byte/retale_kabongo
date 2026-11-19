@@ -1,4 +1,3 @@
-import User from '#models/user'
 import EmailVerifications from '#services/email_verifications'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -11,14 +10,13 @@ export default class EmailVerificationsController {
 
   async resend({ session, response }: HttpContext) {
     const email = session.get(pendingKey)
-    const user = email ? await User.findBy('email', email) : null
+    const sent = email ? await EmailVerifications.resend(email) : false
 
-    if (!user || user.emailVerifiedAt) {
+    if (!sent) {
       session.flash('error', 'Impossible de renvoyer le lien. Inscris-toi à nouveau.')
       return response.redirect().toRoute('email_verification')
     }
 
-    await EmailVerifications.issueAndNotify(user)
     session.flash('success', 'Un nouveau lien a été envoyé.')
     return response.redirect().toRoute('email_verification')
   }

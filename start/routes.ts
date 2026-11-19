@@ -41,6 +41,7 @@ router
   .group(() => {
     router.get('/chat', [controllers.Conversations, 'index']).as('chat')
     router.get('/chat/new', [controllers.Conversations, 'create']).as('conversations.create')
+    router.get('/chat/people', [controllers.Conversations, 'people']).as('conversations.people')
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
     router.get('/chat/groups/new', [controllers.Groups, 'create']).as('groups.create')
     router.post('/groups', [controllers.Groups, 'store']).as('groups.store')

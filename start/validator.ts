@@ -26,6 +26,8 @@ vine.messagesProvider = new SimpleMessagesProvider(
     string: 'Le champ {{ field }} est invalide.',
     email: 'Cette adresse e-mail n’est pas valide.',
     unique: 'Un compte existe déjà avec cette adresse.',
+    'database.unique': 'Un compte existe déjà avec cette adresse.',
+    'email.database.unique': 'Un compte existe déjà avec cette adresse.',
     minLength: 'Le champ {{ field }} est trop court.',
     'password.minLength': 'Le mot de passe doit contenir au moins {{ min }} caractères.',
     'passwordConfirmation.minLength': 'La confirmation doit contenir au moins {{ min }} caractères.',

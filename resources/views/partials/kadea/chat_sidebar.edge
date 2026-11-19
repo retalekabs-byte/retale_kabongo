@@ -6,11 +6,18 @@
       <h1>Kadea Chat</h1>
     @end
     <div class="flex items-center gap-1">
-      <a href="{{ route('conversations.create') }}" class="chat-icon-btn" aria-label="Nouvelle conversation" title="Nouvelle conversation">
+      <button type="button" class="chat-icon-btn" id="btn-new-chat" aria-label="Nouvelle conversation" title="Nouvelle conversation">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" d="M12 5v14M5 12h14" />
         </svg>
-      </a>
+      </button>
+      <button type="button" class="chat-icon-btn" id="btn-new-group" aria-label="Nouveau groupe" title="Nouveau groupe">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+          <circle cx="9" cy="7" r="3" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+        </svg>
+      </button>
       @include('partials/kadea/theme_toggle')
       <a
         href="{{ route('profile') }}"
@@ -23,11 +30,44 @@
         </svg>
       </a>
     </div>
+    <div id="new-chat-pop" class="chat-pop" hidden data-people="{{ route('conversations.people') }}" data-store="{{ route('conversations.store') }}">
+      <div class="chat-modal-head">
+        <h2>Nouvelle conversation</h2>
+        <button type="button" class="chat-icon-btn" data-close-chat aria-label="Fermer">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+      <input id="new-chat-search" type="search" placeholder="Rechercher une personne…" aria-label="Rechercher une personne" />
+      <div id="new-chat-list" class="chat-modal-list"></div>
+      <div hidden id="new-chat-csrf">{{ csrfField() }}</div>
+    </div>
+    <div id="new-group-pop" class="chat-pop" hidden data-people="{{ route('conversations.people') }}">
+      <form id="new-group-form" action="{{ route('groups.store') }}" method="post" enctype="multipart/form-data">
+        {{ csrfField() }}
+        <div class="chat-modal-head">
+          <h2>Nouveau groupe</h2>
+          <button type="button" class="chat-icon-btn" data-close-pop aria-label="Fermer">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+        <input id="new-group-name" name="name" type="text" placeholder="Nom du groupe" aria-label="Nom du groupe" required maxlength="255" />
+        <input id="new-group-avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="Photo du groupe" />
+        <input id="new-group-search" type="search" placeholder="Ajouter une personne…" aria-label="Ajouter une personne" />
+        <p id="new-group-hint" class="chat-pop-hint">Choisis au moins une autre personne.</p>
+        <div id="new-group-selected" class="chat-pop-selected"></div>
+        <div id="new-group-list" class="chat-modal-list"></div>
+        <button type="submit" class="btn-primary auth-submit">Créer le groupe</button>
+      </form>
+    </div>
   </div>
 
-  <form class="chat-search" action="{{ route('conversations.create') }}" method="get">
-    <input type="search" name="q" value="{{ query }}" placeholder="Rechercher une personne…" aria-label="Rechercher une personne" />
-  </form>
+  <div class="chat-search">
+    <input type="search" id="chat-list-search" placeholder="Rechercher une conversation…" aria-label="Rechercher une conversation" />
+  </div>
 
   <p class="chat-section-label">Conversations</p>
 

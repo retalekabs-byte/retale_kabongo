@@ -18,6 +18,7 @@ export type ScannedRoutes = {
     'session.store': { paramsTuple?: []; params?: {} }
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
+    'conversations.people': { paramsTuple?: []; params?: {} }
     'conversations.store': { paramsTuple?: []; params?: {} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
@@ -47,6 +48,7 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
+    'conversations.people': { paramsTuple?: []; params?: {} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -64,6 +66,7 @@ export type ScannedRoutes = {
     'session.create': { paramsTuple?: []; params?: {} }
     'chat': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
+    'conversations.people': { paramsTuple?: []; params?: {} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'chat.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

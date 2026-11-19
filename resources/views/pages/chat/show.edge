@@ -46,16 +46,31 @@
 
       <div class="chat-messages">
         @each(message in messages)
-          <div class="chat-bubble {{ message.mine ? 'chat-bubble--out' : 'chat-bubble--in' }}" data-message-id="{{ message.id }}">
-            <span class="chat-bubble-author">{{ message.author }}</span>
-            {{ message.body }}
-            <time>{{ message.time }}</time>
+          <div class="chat-row {{ message.mine ? 'chat-row--out' : '' }}" data-message-id="{{ message.id }}">
             @if(message.mine)
-              <form action="{{ route('messages.destroy', { id: conversation.id, messageId: message.id }) }}" method="post">
-                {{ csrfField() }}
-                <button type="submit" class="chat-bubble-delete">Supprimer</button>
-              </form>
+              <div class="chat-bubble-menu">
+                <div class="chat-bubble-menu-panel">
+                  <form action="{{ route('messages.destroy', { id: conversation.id, messageId: message.id }) }}" method="post">
+                    {{ csrfField() }}
+                    <button type="submit">Supprimer</button>
+                  </form>
+                </div>
+              </div>
             @end
+            <div class="chat-bubble {{ message.mine ? 'chat-bubble--out' : 'chat-bubble--in' }}">
+              @if(message.mine)
+                <button type="button" class="chat-bubble-more" aria-label="Actions du message" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="5" r="1.7" />
+                    <circle cx="12" cy="12" r="1.7" />
+                    <circle cx="12" cy="19" r="1.7" />
+                  </svg>
+                </button>
+              @end
+              <span class="chat-bubble-author">{{ message.author }}</span>
+              {{ message.body }}
+              <time>{{ message.time }}</time>
+            </div>
           </div>
         @else
           <p class="chat-empty">Aucun message pour le moment.</p>
