@@ -1,0 +1,53 @@
+@kadea.chat({
+  title: 'Nouvelle conversation — Kadea Chat',
+  bodyClass: 'chat-body',
+  chatMode: 'chat',
+  conversations: conversations,
+  query: query,
+  showList: false,
+})
+  <section class="chat-main" aria-label="Nouvelle conversation">
+    <header class="chat-main-head">
+      <a href="{{ route('chat') }}" class="chat-icon-btn md:hidden" id="btn-back-list" aria-label="Retour à la liste">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <div class="min-w-0 flex-1">
+        <h2>Nouvelle conversation</h2>
+        <a href="{{ route('groups.create') }}">Créer un groupe</a>
+      </div>
+    </header>
+
+    <div class="chat-messages">
+      @if(flashMessages?.has('error'))
+        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
+      @end
+
+      @if(!query)
+        <p class="chat-empty">Saisis un nom ou un e-mail dans la recherche.</p>
+      @else
+        @each(person in people)
+          <div class="chat-person">
+            <div class="chat-avatar" aria-hidden="true">{{ person.initials }}</div>
+            <div class="chat-conv-meta">
+              <span class="chat-conv-name">{{ person.fullName }}</span>
+              <p class="chat-conv-preview">{{ person.email }}</p>
+            </div>
+            @if(blockedIds.includes(person.id))
+              <span class="chat-person-btn chat-person-btn--quiet">Bloqué</span>
+            @else
+              <form action="{{ route('conversations.store') }}" method="post">
+                {{ csrfField() }}
+                <input type="hidden" name="userId" value="{{ person.id }}" />
+                <button type="submit" class="btn-primary chat-person-btn">Discuter</button>
+              </form>
+            @end
+          </div>
+        @else
+          <p class="chat-empty">Aucune personne trouvée.</p>
+        @end
+      @end
+    </div>
+  </section>
+@end

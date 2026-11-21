@@ -10,12 +10,22 @@
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
+import transmit from '@adonisjs/transmit/services/main'
 
 router.on('/').render('pages/home').as('home')
-router.on('/email-verification').render('pages/auth/email_verification').as('email_verification')
-router.on('/reset').render('pages/auth/reset').as('password.reset')
-router.on('/chat').render('pages/chat/show').as('chat')
-router.on('/profile').render('pages/chat/profile').as('profile')
+router
+  .get('/email-verification', [controllers.EmailVerifications, 'show'])
+  .as('email_verification')
+router
+  .post('/email-verification/resend', [controllers.EmailVerifications, 'resend'])
+  .as('email_verification.resend')
+router
+  .get('/email-verification/:token', [controllers.EmailVerifications, 'confirm'])
+  .as('email_verification.confirm')
+router.get('/reset', [controllers.PasswordResets, 'create']).as('password.reset')
+router.post('/reset', [controllers.PasswordResets, 'store']).as('password.reset.store')
+router.get('/reset/:token', [controllers.PasswordResets, 'edit']).as('password.reset.edit')
+router.post('/reset/:token', [controllers.PasswordResets, 'update']).as('password.reset.update')
 
 router
   .group(() => {
@@ -29,7 +39,31 @@ router
 
 router
   .group(() => {
+    router.get('/chat', [controllers.Conversations, 'index']).as('chat')
+    router.get('/chat/new', [controllers.Conversations, 'create']).as('conversations.create')
+    router.get('/chat/people', [controllers.Conversations, 'people']).as('conversations.people')
+    router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
+    router.get('/chat/groups/new', [controllers.Groups, 'create']).as('groups.create')
+    router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
+    router.get('/chat/:id/members', [controllers.Groups, 'members']).as('groups.members')
+    router.post('/chat/:id/members', [controllers.Groups, 'add']).as('groups.add')
+    router.post('/chat/:id/members/:userId/remove', [controllers.Groups, 'remove']).as('groups.remove')
+    router.get('/chat/:id', [controllers.Conversations, 'show']).as('chat.show')
+    router.post('/chat/:id/messages', [controllers.Messages, 'store']).as('messages.store')
+    router
+      .post('/chat/:id/messages/:messageId/delete', [controllers.Messages, 'destroy'])
+      .as('messages.destroy')
+    router.post('/blocks', [controllers.Blocks, 'store']).as('blocks.store')
+    router.post('/blocks/:userId/delete', [controllers.Blocks, 'destroy']).as('blocks.destroy')
+    router.get('/profile', [controllers.Profiles, 'show']).as('profile')
+    router.post('/profile', [controllers.Profiles, 'update']).as('profile.update')
     router.on('/dashboard').render('pages/dashboard').as('dashboard')
     router.post('logout', [controllers.Session, 'destroy'])
   })
   .use(middleware.auth())
+
+transmit.registerRoutes((route) => {
+  if (route.getPattern() === '__transmit/subscribe') {
+    route.middleware(middleware.auth())
+  }
+})

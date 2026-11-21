@@ -8,12 +8,14 @@
     Indique ton e-mail : tu recevras un lien pour choisir un nouveau mot de passe.
   </p>
 
-  <form class="auth-form" action="#" method="get">
+  <form class="auth-form" action="{{ route('password.reset.store') }}" method="post">
+    {{ csrfField() }}
     <div class="auth-field">
       <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" />
+      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" value="{{ old('email') || '' }}" />
+      @!kadea.fieldError({ name: 'email' })
     </div>
-    <button type="button" class="btn-primary auth-submit">Envoyer le lien</button>
+    <button type="submit" class="btn-primary auth-submit">Envoyer le lien</button>
   </form>
 
   <p class="auth-footer">

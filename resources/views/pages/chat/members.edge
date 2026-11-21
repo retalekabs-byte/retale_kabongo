@@ -1,0 +1,65 @@
+@kadea.chat({
+  title: `${conversation.name} — Membres`,
+  bodyClass: 'chat-body',
+  chatMode: 'chat',
+  conversations: conversations,
+  activeId: conversation.id,
+  query: query,
+  showList: false,
+})
+  <section class="chat-main" aria-label="Membres du groupe">
+    <header class="chat-main-head">
+      <a href="{{ route('chat.show', { id: conversation.id }) }}" class="chat-icon-btn md:hidden" id="btn-back-list" aria-label="Retour à la conversation">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <div class="min-w-0 flex-1">
+        <h2>Membres</h2>
+      </div>
+    </header>
+
+    <div class="chat-messages">
+      @if(flashMessages?.has('success'))
+        <div class="auth-message auth-message--success chat-flash" role="status">{{ flashMessages.get('success') }}</div>
+      @end
+      @if(flashMessages?.has('error'))
+        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
+      @end
+
+      @each(member in members)
+        <div class="chat-person">
+          <div class="chat-avatar" aria-hidden="true">{{ member.user.initials }}</div>
+          <div class="chat-conv-meta">
+            <span class="chat-conv-name">{{ member.user.fullName }}</span>
+            <p class="chat-conv-preview">{{ member.role === 'admin' ? 'Admin' : 'Membre' }}</p>
+          </div>
+          @if(isAdmin && member.userId !== auth.user.id)
+            <form action="{{ route('groups.remove', { id: conversation.id, userId: member.userId }) }}" method="post">
+              {{ csrfField() }}
+              <button type="submit" class="chat-person-btn chat-person-btn--quiet">Retirer</button>
+            </form>
+          @end
+        </div>
+      @end
+
+      @if(isAdmin)
+        <form class="chat-search chat-search--panel" action="{{ route('groups.members', { id: conversation.id }) }}" method="get">
+          <input type="search" name="q" value="{{ query }}" placeholder="Ajouter un membre…" aria-label="Ajouter un membre" />
+        </form>
+        @each(person in people)
+          <form class="chat-person" action="{{ route('groups.add', { id: conversation.id }) }}" method="post">
+            {{ csrfField() }}
+            <input type="hidden" name="userId" value="{{ person.id }}" />
+            <div class="chat-avatar" aria-hidden="true">{{ person.initials }}</div>
+            <div class="chat-conv-meta">
+              <span class="chat-conv-name">{{ person.fullName }}</span>
+              <p class="chat-conv-preview">{{ person.email }}</p>
+            </div>
+            <button type="submit" class="btn-primary chat-person-btn">Ajouter</button>
+          </form>
+        @end
+      @end
+    </div>
+  </section>
+@end

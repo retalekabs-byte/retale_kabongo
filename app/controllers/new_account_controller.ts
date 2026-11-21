@@ -1,28 +1,25 @@
-import User from '#models/user'
+import EmailVerifications from '#services/email_verifications'
 import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
-/**
- * NewAccountController handles user registration.
- * It provides methods for displaying the signup page and creating
- * new user accounts.
- */
 export default class NewAccountController {
-  /**
-   * Display the signup page
-   */
   async create({ view }: HttpContext) {
     return view.render('pages/auth/signup')
   }
 
-  /**
-   * Create a new user account and authenticate the user
-   */
-  async store({ request, response, auth }: HttpContext) {
+  async store({ request, response, session }: HttpContext) {
     const { fullName, email, password } = await request.validateUsing(signupValidator)
-    const user = await User.create({ fullName, email, password })
+    const started = await EmailVerifications.start({ fullName, email, password })
 
-    await auth.use('web').login(user)
-    response.redirect().toRoute('dashboard')
+    if (!started) {
+      session.flashExcept(['password', 'passwordConfirmation', '_csrf'])
+      session.flash('inputErrorsBag', {
+        email: ['Un compte existe déjà avec cette adresse.'],
+      })
+      return response.redirect().back()
+    }
+
+    session.put('pendingVerificationEmail', email)
+    response.redirect().toRoute('email_verification')
   }
 }

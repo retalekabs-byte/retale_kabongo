@@ -13,15 +13,19 @@
     {{ csrfField() }}
     <div class="auth-field">
       <label for="fullName">Nom</label>
-      <input id="fullName" name="fullName" type="text" placeholder="Ton nom" required autocomplete="name" />
+      <input id="fullName" name="fullName" type="text" placeholder="Ton nom" required autocomplete="name" value="{{ old('fullName') || '' }}" />
+      @!kadea.fieldError({ name: 'fullName' })
     </div>
     <div class="auth-field">
       <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" />
+      <input id="email" name="email" type="email" placeholder="toi@exemple.com" required autocomplete="email" value="{{ old('email') || '' }}" />
+      @!kadea.fieldError({ name: 'email' })
     </div>
     <div class="auth-field">
       <label for="password">Mot de passe</label>
-      <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="new-password" />
+      <input id="password" name="password" type="password" placeholder="••••••••" required minlength="8" maxlength="32" autocomplete="new-password" />
+      <p class="auth-hint">Au moins 8 caractères.</p>
+      @!kadea.fieldError({ name: 'password' })
     </div>
     <div class="auth-field">
       <label for="passwordConfirmation">Confirmer le mot de passe</label>
@@ -33,6 +37,7 @@
         required
         autocomplete="new-password"
       />
+      @!kadea.fieldError({ name: 'passwordConfirmation' })
     </div>
     <button type="submit" class="btn-primary auth-submit">Créer mon compte</button>
   </form>

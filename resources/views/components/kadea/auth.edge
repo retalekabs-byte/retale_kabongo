@@ -8,6 +8,12 @@
   <main class="auth-page">
     @include('partials/kadea/auth_decor')
     <div class="auth-card {{ $props.get('cardClass') }}">
+      @if(flashMessages?.has('error'))
+        <div class="auth-message auth-message--error" role="alert">{{ flashMessages.get('error') }}</div>
+      @end
+      @if(flashMessages?.has('success'))
+        <div class="auth-message auth-message--success" role="status">{{ flashMessages.get('success') }}</div>
+      @end
       {{{ await $slots.main() }}}
     </div>
   </main>

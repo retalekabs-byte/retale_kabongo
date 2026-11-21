@@ -1,12 +1,22 @@
 @let(mode = $props.get('chatMode') || 'chat')
+@let(conversations = $props.get('conversations') || [])
+@let(activeId = $props.get('activeId'))
+@let(query = $props.get('query') || '')
+@let(showList = $props.get('showList'))
 
 @kadea.shell({
   title: $props.get('title'),
   bodyClass: $props.get('bodyClass') || 'chat-body',
 })
-  <div class="chat-app" id="chat-app">
+  <div
+    class="chat-app {{ showList ? 'show-list' : '' }}"
+    id="chat-app"
+    data-user-id="{{ auth.user.id }}"
+    data-open="{{ activeId || '' }}"
+    data-channels="{{ conversations.map((item) => item.id).join(',') }}"
+  >
     @include('partials/kadea/chat_sidebar')
     {{{ await $slots.main() }}}
   </div>
-  <script src="/js/kadea-ui.js"></script>
+  <script src="/js/kadea-live.js"></script>
 @end

@@ -2,6 +2,7 @@
   title: 'Profil — Kadea Chat',
   bodyClass: 'chat-body',
   chatMode: 'profile',
+  conversations: conversations,
 })
   <section class="chat-main" aria-label="Mon profil">
     <header class="chat-main-head">
@@ -13,36 +14,50 @@
       <div class="min-w-0 flex-1">
         <h2>Mon profil</h2>
       </div>
-      <a href="{{ route('session.create') }}" class="chat-icon-btn" aria-label="Déconnexion" title="Déconnexion">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
-        </svg>
-      </a>
+      <form action="{{ route('session.destroy') }}" method="post" class="contents">
+        {{ csrfField() }}
+        <button type="submit" class="chat-icon-btn" aria-label="Déconnexion" title="Déconnexion">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
+        </button>
+      </form>
     </header>
 
     <div class="chat-profile">
+      @if(flashMessages?.has('error'))
+        <div class="auth-message auth-message--error" role="alert">{{ flashMessages.get('error') }}</div>
+      @end
+      @if(flashMessages?.has('success'))
+        <div class="auth-message auth-message--success" role="status">{{ flashMessages.get('success') }}</div>
+      @end
+
       <div class="chat-profile-card">
-        <div class="chat-avatar chat-profile-avatar" aria-hidden="true">RK</div>
-        <p class="chat-profile-name">Retale Kabongo</p>
-        <p class="chat-profile-email">retale@exemple.com</p>
+        @if(user.avatar)
+          <img src="{{ user.avatar }}" alt="" class="chat-avatar chat-profile-avatar" />
+        @else
+          <div class="chat-avatar chat-profile-avatar" aria-hidden="true">{{ user.initials }}</div>
+        @end
+        <p class="chat-profile-name">{{ user.fullName }}</p>
+        <p class="chat-profile-email">{{ user.email }}</p>
       </div>
 
-      <form class="chat-profile-form" action="#" method="get">
+      <form class="chat-profile-form" action="{{ route('profile.update') }}" method="post">
+        {{ csrfField() }}
         <div class="auth-field">
-          <label for="name">Nom</label>
-          <input id="name" name="name" type="text" value="Retale Kabongo" required autocomplete="name" />
+          <label for="fullName">Nom</label>
+          <input id="fullName" name="fullName" type="text" value="{{ old('fullName') || user.fullName }}" required autocomplete="name" />
+          @!kadea.fieldError({ name: 'fullName' })
         </div>
         <div class="auth-field">
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" value="retale@exemple.com" required autocomplete="email" />
-        </div>
-        <div class="auth-field">
-          <label for="avatar">Avatar</label>
-          <input id="avatar" name="avatar" type="file" accept="image/*" />
+          <input id="email" type="email" value="{{ user.email }}" readonly />
         </div>
         <div class="auth-field">
           <label for="password">Nouveau mot de passe</label>
-          <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" />
+          <input id="password" name="password" type="password" placeholder="Laisser vide pour ne pas changer" minlength="8" maxlength="32" autocomplete="new-password" />
+          <p class="auth-hint">Au moins 8 caractères, seulement si tu le changes.</p>
+          @!kadea.fieldError({ name: 'password' })
         </div>
         <div class="auth-field">
           <label for="passwordConfirmation">Confirmer le mot de passe</label>
@@ -53,9 +68,29 @@
             placeholder="••••••••"
             autocomplete="new-password"
           />
+          @!kadea.fieldError({ name: 'passwordConfirmation' })
         </div>
-        <button type="button" class="btn-primary auth-submit">Enregistrer</button>
+        <button type="submit" class="btn-primary auth-submit">Enregistrer</button>
       </form>
+
+      <div class="chat-profile-form">
+        <p class="chat-section-label">Personnes bloquées</p>
+        @each(block in blocks)
+          <div class="chat-person">
+            <div class="chat-avatar" aria-hidden="true">{{ block.blocked.initials }}</div>
+            <div class="chat-conv-meta">
+              <span class="chat-conv-name">{{ block.blocked.fullName }}</span>
+              <p class="chat-conv-preview">{{ block.blocked.email }}</p>
+            </div>
+            <form action="{{ route('blocks.destroy', { userId: block.blockedId }) }}" method="post">
+              {{ csrfField() }}
+              <button type="submit" class="chat-person-btn chat-person-btn--quiet">Débloquer</button>
+            </form>
+          </div>
+        @else
+          <p class="chat-conv-preview">Personne n’est bloqué.</p>
+        @end
+      </div>
     </div>
   </section>
 @end

@@ -104,6 +104,27 @@ export class PasswordResetTokenSchema extends BaseModel {
   declare userId: number
 }
 
+export class PendingAccountSchema extends BaseModel {
+  static $columns = ['createdAt', 'email', 'expiresAt', 'fullName', 'id', 'password', 'token', 'updatedAt'] as const
+  $columns = PendingAccountSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column()
+  declare fullName: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column({ serializeAs: null })
+  declare password: string
+  @column()
+  declare token: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserBlockSchema extends BaseModel {
   static $columns = ['blockedId', 'blockerId', 'createdAt', 'id', 'updatedAt'] as const
   $columns = UserBlockSchema.$columns
