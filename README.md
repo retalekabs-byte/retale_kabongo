@@ -84,6 +84,10 @@ DB_DATABASE=projet-kadea
 
 En production (ex. Render) : `NODE_ENV=production`, `HOST=0.0.0.0`, et `APP_URL` = l’URL publique de l’app.
 
+Sur Render :
+- **Build** : `npm run build:render`
+- **Start** : `node build/ace.js migration:run --force && node build/bin/server.js`
+
 ---
 
 ## Installation (local)
