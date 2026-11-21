@@ -11,13 +11,20 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class MessagesController {
   async store({ params, request, auth, response, session }: HttpContext) {
     const user = auth.user!
+    const wantsJson = request.ajax() || request.accepts(['html', 'json']) === 'json'
     const conversation = await this.writableConversation(Number(params.id), user.id)
     if (!conversation) {
+      if (wantsJson) {
+        return response.status(403).json({ error: 'Tu n’as pas accès à cette conversation.' })
+      }
       session.flash('error', 'Tu n’as pas accès à cette conversation.')
       return response.redirect().toRoute('chat')
     }
 
     if (conversation.type === 'private' && (await this.privateIsBlocked(conversation.id, user.id))) {
+      if (wantsJson) {
+        return response.status(403).json({ error: 'Un blocage empêche d’envoyer un message privé.' })
+      }
       session.flash('error', 'Un blocage empêche d’envoyer un message privé.')
       return response.redirect().toRoute('chat.show', { id: conversation.id })
     }
@@ -33,14 +40,24 @@ export default class MessagesController {
     conversation.updatedAt = DateTime.now()
     await conversation.save()
 
-    transmit.broadcast(`conversations/${conversation.id}`, {
-      type: 'created',
+    const payload = {
+      type: 'created' as const,
       id: message.id,
       body: message.body,
       author: message.user.fullName,
       userId: message.userId,
       time: message.createdAt.toFormat('HH:mm'),
-    })
+    }
+
+    transmit.broadcast(`conversations/${conversation.id}`, payload)
+
+    if (wantsJson) {
+      return response.json({
+        ...payload,
+        conversationId: conversation.id,
+        mine: true,
+      })
+    }
 
     return response.redirect().toRoute('chat.show', { id: conversation.id })
   }

@@ -528,7 +528,124 @@
     firstInvalid.focus()
   }
 
+  function xsrfToken() {
+    var match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/)
+    return match ? decodeURIComponent(match[1]) : ''
+  }
+
+  function appendOwnMessage(payload, destroyUrl) {
+    var list = document.querySelector('.chat-messages')
+    if (!list) return
+    if (list.querySelector('[data-message-id="' + payload.id + '"]')) return
+    var empty = list.querySelector('.chat-empty')
+    if (empty) empty.remove()
+
+    var row = document.createElement('div')
+    row.className = 'chat-row chat-row--out'
+    row.dataset.messageId = String(payload.id)
+
+    var menu = document.createElement('div')
+    menu.className = 'chat-bubble-menu'
+    var panel = document.createElement('div')
+    panel.className = 'chat-bubble-menu-panel'
+    var form = document.createElement('form')
+    form.method = 'post'
+    form.action = destroyUrl
+    var csrf = document.createElement('input')
+    csrf.type = 'hidden'
+    csrf.name = '_csrf'
+    csrf.value = xsrfToken()
+    var del = document.createElement('button')
+    del.type = 'submit'
+    del.textContent = 'Supprimer'
+    form.appendChild(csrf)
+    form.appendChild(del)
+    panel.appendChild(form)
+    menu.appendChild(panel)
+    row.appendChild(menu)
+
+    var bubble = document.createElement('div')
+    bubble.className = 'chat-bubble chat-bubble--out'
+    var more = document.createElement('button')
+    more.type = 'button'
+    more.className = 'chat-bubble-more'
+    more.setAttribute('aria-label', 'Actions du message')
+    more.setAttribute('aria-expanded', 'false')
+    more.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="12" cy="19" r="1.7" /></svg>'
+    bubble.appendChild(more)
+    var author = document.createElement('span')
+    author.className = 'chat-bubble-author'
+    author.textContent = payload.author
+    bubble.appendChild(author)
+    bubble.appendChild(document.createTextNode(payload.body))
+    var time = document.createElement('time')
+    time.textContent = payload.time
+    bubble.appendChild(time)
+    row.appendChild(bubble)
+    list.appendChild(row)
+    list.scrollTop = list.scrollHeight
+  }
+
+  var composer = document.querySelector('form.chat-composer')
+  if (composer) {
+    composer.addEventListener('submit', function (event) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      var input = composer.querySelector('input[name="body"]')
+      var button = composer.querySelector('[type="submit"]')
+      var body = input ? String(input.value || '').trim() : ''
+      if (!body || composer.getAttribute('data-sending')) return
+      composer.setAttribute('data-sending', '1')
+      if (button) button.setAttribute('data-loading', '1')
+
+      var data = new FormData(composer)
+      fetch(composer.action, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': xsrfToken(),
+        },
+        body: data,
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('send')
+          return res.json()
+        })
+        .then(function (payload) {
+          if (input) input.value = ''
+          var destroyUrl = composer.action.replace(/\/?$/, '/') + payload.id + '/delete'
+          appendOwnMessage(payload, destroyUrl)
+          var link = document.querySelector(
+            '.chat-conv[data-conversation-id="' + payload.conversationId + '"]'
+          )
+          if (link) {
+            var previewNode = link.querySelector('.chat-conv-preview')
+            var timeNode = link.querySelector('.chat-conv-time')
+            if (previewNode) previewNode.textContent = payload.body
+            if (timeNode) timeNode.textContent = payload.time
+            var list = link.parentElement
+            if (list && list.firstElementChild !== link) list.prepend(link)
+          }
+          if (input) input.focus()
+        })
+        .catch(function () {
+          composer.submit()
+        })
+        .finally(function () {
+          composer.removeAttribute('data-sending')
+          if (button) {
+            button.removeAttribute('data-loading')
+            button.disabled = false
+          }
+        })
+    })
+  }
+
   document.querySelectorAll('form').forEach(function (form) {
+    if (form.classList.contains('chat-composer')) return
     form.addEventListener('submit', function () {
       var button = form.querySelector('[type="submit"]')
       if (!button || button.getAttribute('data-loading')) return
