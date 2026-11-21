@@ -31,12 +31,14 @@
   })
 
   function applyTheme(dark) {
+    document.documentElement.classList.toggle('theme-dark', dark)
     document.body.classList.toggle('theme-dark', dark)
     document.querySelectorAll('.js-theme-toggle').forEach(function (btn) {
       var sun = btn.querySelector('.theme-icon-sun')
       var moon = btn.querySelector('.theme-icon-moon')
       if (sun) sun.classList.toggle('is-hidden', dark)
       if (moon) moon.classList.toggle('is-hidden', !dark)
+      btn.setAttribute('aria-pressed', dark ? 'true' : 'false')
     })
     try {
       localStorage.setItem('kadea-theme', dark ? 'dark' : 'light')
