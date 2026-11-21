@@ -30,9 +30,13 @@
     window.setTimeout(syncViewportFrame, 300)
   })
 
+  function isDarkTheme() {
+    return document.documentElement.classList.contains('theme-dark')
+  }
+
   function applyTheme(dark) {
     document.documentElement.classList.toggle('theme-dark', dark)
-    document.body.classList.toggle('theme-dark', dark)
+    if (document.body) document.body.classList.toggle('theme-dark', dark)
     document.querySelectorAll('.js-theme-toggle').forEach(function (btn) {
       var sun = btn.querySelector('.theme-icon-sun')
       var moon = btn.querySelector('.theme-icon-moon')
@@ -51,12 +55,29 @@
   } catch (e) {}
   applyTheme(saved === 'dark')
 
-  document.addEventListener('click', function (event) {
+  var themeLock = false
+  function onThemeToggle(event) {
     var btn = event.target.closest('.js-theme-toggle')
-    if (!btn) return
+    if (!btn || themeLock) return
+    themeLock = true
     event.preventDefault()
-    applyTheme(!document.body.classList.contains('theme-dark'))
-  })
+    event.stopPropagation()
+    applyTheme(!isDarkTheme())
+    window.setTimeout(function () {
+      themeLock = false
+    }, 350)
+  }
+
+  document.addEventListener('click', onThemeToggle, true)
+  document.addEventListener(
+    'touchend',
+    function (event) {
+      var btn = event.target.closest('.js-theme-toggle')
+      if (!btn) return
+      onThemeToggle(event)
+    },
+    { capture: true, passive: false }
+  )
 
   document.addEventListener('input', function (event) {
     var target = event.target
@@ -324,8 +345,19 @@
           loadGroupPeople(value)
         }, 200)
       })
+      groupSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') event.preventDefault()
+      })
     }
     groupForm.addEventListener('submit', function (event) {
+      var nameInput = document.getElementById('new-group-name')
+      var name = nameInput ? String(nameInput.value || '').trim() : ''
+      if (!name) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        if (nameInput) nameInput.focus()
+        return
+      }
       if (!picked.length) {
         event.preventDefault()
         event.stopImmediatePropagation()
@@ -599,7 +631,11 @@
       composer.setAttribute('data-sending', '1')
       if (button) button.setAttribute('data-loading', '1')
 
-      var data = new FormData(composer)
+      var csrfInput = composer.querySelector('input[name="_csrf"]')
+      var data = new FormData()
+      data.append('body', body)
+      data.append('_csrf', csrfInput ? csrfInput.value : xsrfToken())
+
       fetch(composer.action, {
         method: 'POST',
         credentials: 'same-origin',
@@ -632,7 +668,8 @@
           if (input) input.focus()
         })
         .catch(function () {
-          composer.submit()
+          if (input) input.value = body
+          window.alert('Impossible d’envoyer le message. Réessaie.')
         })
         .finally(function () {
           composer.removeAttribute('data-sending')
