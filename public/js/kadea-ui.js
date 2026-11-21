@@ -5,6 +5,34 @@
   var sun = themeBtn && themeBtn.querySelector('.theme-icon-sun')
   var moon = themeBtn && themeBtn.querySelector('.theme-icon-moon')
 
+  function syncViewportFrame() {
+    var vv = window.visualViewport
+    var height = vv ? vv.height : window.innerHeight
+    var offset = vv ? vv.offsetTop : 0
+    document.documentElement.style.setProperty('--app-height', height + 'px')
+    document.documentElement.style.setProperty('--app-offset', offset + 'px')
+  }
+
+  syncViewportFrame()
+  window.addEventListener('resize', syncViewportFrame)
+  window.addEventListener('orientationchange', syncViewportFrame)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncViewportFrame)
+    window.visualViewport.addEventListener('scroll', syncViewportFrame)
+  }
+
+  document.addEventListener('focusin', function (event) {
+    var target = event.target
+    if (!target || !target.closest) return
+    if (!target.closest('.chat-composer, .chat-search, .chat-pop, .auth-field, .chat-info-add')) return
+    window.setTimeout(syncViewportFrame, 50)
+    window.setTimeout(syncViewportFrame, 300)
+  })
+  document.addEventListener('focusout', function () {
+    window.setTimeout(syncViewportFrame, 50)
+    window.setTimeout(syncViewportFrame, 300)
+  })
+
   function applyTheme(dark) {
     document.body.classList.toggle('theme-dark', dark)
     if (sun && moon) {

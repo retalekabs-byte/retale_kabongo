@@ -5,6 +5,8 @@
   --color-white: #ffffff;
   --color-muted: #6b7280;
   --color-text: #111827;
+  --app-height: 100dvh;
+  --app-offset: 0px;
 }
 
 *,
@@ -496,20 +498,25 @@ body {
 
 /* ——— Chat page ——— */
 .chat-body {
-  height: 100vh;
+  height: var(--app-height, 100dvh);
+  max-height: var(--app-height, 100dvh);
   overflow: hidden;
+  overscroll-behavior: none;
   background: var(--color-features);
+  touch-action: manipulation;
 }
 
 .chat-app {
   display: grid;
   grid-template-columns: 22rem 1fr;
-  height: 100vh;
+  height: var(--app-height, 100dvh);
+  max-height: var(--app-height, 100dvh);
   max-width: 1400px;
   margin: 0 auto;
   background: #fff;
   border-left: 1px solid #e8eaf2;
   border-right: 1px solid #e8eaf2;
+  overflow: hidden;
 }
 
 .chat-sidebar {
@@ -880,16 +887,19 @@ body {
   align-items: center;
   gap: 0.65rem;
   padding: 0.9rem 1.1rem;
+  padding-bottom: max(0.9rem, env(safe-area-inset-bottom));
   background: #fff;
   border-top: 1px solid #e8eaf2;
+  flex-shrink: 0;
 }
 
 .chat-composer input {
   flex: 1;
+  min-width: 0;
   border: 1px solid #e5e7eb;
   border-radius: 999px;
   padding: 0.75rem 1.1rem;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-family: inherit;
   background: #f7f8ff;
 }
@@ -1540,20 +1550,56 @@ body.theme-dark .chat-profile-form {
 }
 
 @media (max-width: 900px) {
+  html,
+  body.chat-body {
+    height: var(--app-height, 100dvh);
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .chat-body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+  }
+
+  .chat-app {
+    position: fixed;
+    top: var(--app-offset, 0px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+    grid-template-columns: 1fr;
+    border: none;
+    margin: 0;
+  }
+
+  .chat-main,
+  .chat-sidebar {
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+  }
+
   .chat-sidebar-head .chat-pop {
     position: fixed;
-    top: 4.25rem;
+    top: calc(var(--app-offset, 0px) + 4.25rem);
     right: 0.75rem;
     left: 0.75rem;
     width: auto;
-    max-height: calc(100dvh - 5.5rem);
+    max-height: calc(var(--app-height, 100dvh) - 5.5rem);
   }
 
   .chat-info-pop,
   .chat-info-pop--group {
     position: fixed;
     top: auto;
-    bottom: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
     left: 0.75rem;
     right: 0.75rem;
     width: auto;
@@ -1561,12 +1607,16 @@ body.theme-dark .chat-profile-form {
 
   .chat-info-card,
   .chat-info-card--group {
-    max-height: min(75dvh, 34rem);
+    max-height: min(70dvh, calc(var(--app-height, 100dvh) - 2rem));
   }
 
-  .chat-app {
-    grid-template-columns: 1fr;
-    border: none;
+  .chat-composer input,
+  .chat-search input,
+  .chat-pop input[type='search'],
+  .chat-pop input[type='text'],
+  .chat-info-add input[type='search'],
+  .auth-field input {
+    font-size: 16px;
   }
 
   .chat-sidebar {
