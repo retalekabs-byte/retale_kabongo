@@ -1,9 +1,6 @@
 ;(function () {
   var app = document.getElementById('chat-app')
   var back = document.getElementById('btn-back-list')
-  var themeBtn = document.getElementById('theme-toggle')
-  var sun = themeBtn && themeBtn.querySelector('.theme-icon-sun')
-  var moon = themeBtn && themeBtn.querySelector('.theme-icon-moon')
 
   function syncViewportFrame() {
     var vv = window.visualViewport
@@ -35,10 +32,12 @@
 
   function applyTheme(dark) {
     document.body.classList.toggle('theme-dark', dark)
-    if (sun && moon) {
-      sun.hidden = dark
-      moon.hidden = !dark
-    }
+    document.querySelectorAll('.js-theme-toggle').forEach(function (btn) {
+      var sun = btn.querySelector('.theme-icon-sun')
+      var moon = btn.querySelector('.theme-icon-moon')
+      if (sun) sun.classList.toggle('is-hidden', dark)
+      if (moon) moon.classList.toggle('is-hidden', !dark)
+    })
     try {
       localStorage.setItem('kadea-theme', dark ? 'dark' : 'light')
     } catch (e) {}
@@ -50,11 +49,12 @@
   } catch (e) {}
   applyTheme(saved === 'dark')
 
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      applyTheme(!document.body.classList.contains('theme-dark'))
-    })
-  }
+  document.addEventListener('click', function (event) {
+    var btn = event.target.closest('.js-theme-toggle')
+    if (!btn) return
+    event.preventDefault()
+    applyTheme(!document.body.classList.contains('theme-dark'))
+  })
 
   document.addEventListener('input', function (event) {
     var target = event.target

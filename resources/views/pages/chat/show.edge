@@ -24,6 +24,9 @@
         <div class="min-w-0 flex-1">
           <h2>{{ heading }}</h2>
         </div>
+        <div class="chat-main-actions">
+          @include('partials/kadea/theme_toggle')
+        </div>
         @if(conversation.type === 'private' && peer)
           <div class="chat-info">
             <button type="button" class="chat-icon-btn" id="btn-peer-info" aria-label="Informations" title="Informations">

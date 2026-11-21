@@ -14,6 +14,7 @@
       <div class="min-w-0 flex-1">
         <h2>Mon profil</h2>
       </div>
+      @include('partials/kadea/theme_toggle')
       <form action="{{ route('session.destroy') }}" method="post" class="contents">
         {{ csrfField() }}
         <button type="submit" class="chat-icon-btn" aria-label="Déconnexion" title="Déconnexion">

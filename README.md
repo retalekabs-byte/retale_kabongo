@@ -2,6 +2,8 @@
 
 Kadea Chat est une application web de messagerie en temps réel. Elle permet de créer un compte, d’échanger en privé ou en groupe, de gérer son profil et de bloquer une personne si besoin.
 
+**Site en ligne :** [https://retale-kabongo.onrender.com](https://retale-kabongo.onrender.com)
+
 ---
 
 ## Fonctionnalités
