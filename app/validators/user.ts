@@ -28,10 +28,4 @@ export const profileValidator = vine.create({
   fullName: vine.string().maxLength(255),
   password: vine.string().minLength(8).maxLength(32).nullable(),
   passwordConfirmation: vine.string().nullable(),
-  avatar: vine
-    .file({
-      size: '2mb',
-      extnames: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-    })
-    .optional(),
 })

@@ -10,6 +10,9 @@
     @if(flashMessages?.has('error'))
       <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
     @end
+    @if(flashMessages?.has('success'))
+      <div class="auth-message auth-message--success chat-flash" role="status">{{ flashMessages.get('success') }}</div>
+    @end
 
     @if(conversation)
       <header class="chat-main-head">
@@ -59,11 +62,57 @@
           </div>
         @end
         @if(conversation.type === 'group')
-          <a href="{{ route('groups.members', { id: conversation.id }) }}" class="chat-icon-btn" aria-label="Membres" title="Membres">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a3 3 0 11-6 0 3 3 0 016 0zm6 2a3 3 0 11-4-2.83" />
-            </svg>
-          </a>
+          <div class="chat-info">
+            <button type="button" class="chat-icon-btn" id="btn-group-info" aria-label="Informations du groupe" title="Informations">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path stroke-linecap="round" d="M12 11v6" />
+                <circle cx="12" cy="7.5" r="0.8" fill="currentColor" stroke="none" />
+              </svg>
+            </button>
+            <div
+              id="group-info-pop"
+              class="chat-info-pop chat-info-pop--group"
+              hidden
+              data-people="{{ route('conversations.people') }}"
+              data-members="{{ groupMemberIds }}"
+            >
+              <div class="chat-info-card chat-info-card--group">
+                <p class="chat-info-label">Nom du groupe</p>
+                <p class="chat-info-name">{{ heading }}</p>
+
+                <p class="chat-info-label">Personnes</p>
+                <div class="chat-info-people">
+                  @each(member in groupMembers)
+                    <div class="chat-person">
+                      <div class="chat-avatar" aria-hidden="true">{{ member.initials }}</div>
+                      <div class="chat-conv-meta">
+                        <span class="chat-conv-name">{{ member.fullName }}</span>
+                        <p class="chat-conv-preview">{{ member.role }}</p>
+                      </div>
+                      @if(isGroupAdmin && !member.mine)
+                        <form action="{{ route('groups.remove', { id: conversation.id, userId: member.id }) }}" method="post">
+                          {{ csrfField() }}
+                          <button type="submit" class="chat-person-btn chat-person-btn--quiet">Retirer</button>
+                        </form>
+                      @end
+                    </div>
+                  @end
+                </div>
+
+                @if(isGroupAdmin)
+                  <form id="group-add-form" class="chat-info-add" action="{{ route('groups.add', { id: conversation.id }) }}" method="post">
+                    {{ csrfField() }}
+                    <p class="chat-info-label">Ajouter</p>
+                    <input id="group-add-search" type="search" placeholder="Rechercher une personne…" aria-label="Rechercher une personne" />
+                    <div id="group-add-list" class="chat-info-people"></div>
+                    <p id="group-add-hint" class="chat-pop-hint">Coche au moins une personne.</p>
+                    <button type="submit" class="btn-primary auth-submit">Ajouter</button>
+                  </form>
+                @end
+              </div>
+            </div>
+          </div>
         @end
       </header>
 

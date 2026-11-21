@@ -44,9 +44,6 @@ vine.messagesProvider = new SimpleMessagesProvider(
     number: 'Choix invalide.',
     min: 'Choisis au moins une autre personne.',
     'members.minLength': 'Choisis au moins une autre personne.',
-    file: 'Choisis une image valide.',
-    'file.size': 'L’image dépasse 2 Mo.',
-    'file.extname': 'Choisis une image jpg, png, webp ou gif.',
   },
   {
     fullName: 'nom',
@@ -57,7 +54,6 @@ vine.messagesProvider = new SimpleMessagesProvider(
     name: 'nom du groupe',
     userId: 'personne',
     members: 'membres',
-    avatar: 'image',
     q: 'recherche',
   }
 )

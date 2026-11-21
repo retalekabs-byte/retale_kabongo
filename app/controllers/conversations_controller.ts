@@ -89,6 +89,21 @@ export default class ConversationsController {
     const peer = conversation.members.find((member) => member.id !== user.id) || null
     const heading =
       conversation.type === 'group' ? conversation.name || 'Groupe' : peer?.fullName || 'Conversation'
+    const mine =
+      conversation.type === 'group' ? await Conversations.membership(conversation.id, user.id) : null
+    const groupMembers =
+      conversation.type === 'group'
+        ? conversation.members
+            .map((member) => ({
+              id: member.id,
+              fullName: member.fullName,
+              email: member.email,
+              initials: member.initials,
+              role: member.$extras.pivot_role === 'admin' ? 'Admin' : 'Membre',
+              mine: member.id === user.id,
+            }))
+            .sort((a, b) => Number(b.role === 'Admin') - Number(a.role === 'Admin') || a.fullName.localeCompare(b.fullName))
+        : []
     const blocked =
       conversation.type === 'private' && peer ? await Blocks.between(user.id, peer.id) : false
     const blockedByMe =
@@ -107,6 +122,9 @@ export default class ConversationsController {
       peer,
       blocked,
       blockedByMe,
+      groupMembers,
+      groupMemberIds: groupMembers.map((member) => member.id).join(','),
+      isGroupAdmin: mine?.role === 'admin',
       messages: rows.map((message) => ({
         id: message.id,
         body: message.body,

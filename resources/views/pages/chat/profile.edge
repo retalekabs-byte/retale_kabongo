@@ -42,7 +42,7 @@
         <p class="chat-profile-email">{{ user.email }}</p>
       </div>
 
-      <form class="chat-profile-form" action="{{ route('profile.update') }}" method="post" enctype="multipart/form-data">
+      <form class="chat-profile-form" action="{{ route('profile.update') }}" method="post">
         {{ csrfField() }}
         <div class="auth-field">
           <label for="fullName">Nom</label>
@@ -52,11 +52,6 @@
         <div class="auth-field">
           <label for="email">E-mail</label>
           <input id="email" type="email" value="{{ user.email }}" readonly />
-        </div>
-        <div class="auth-field">
-          <label for="avatar">Avatar</label>
-          <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
-          @!kadea.fieldError({ name: 'avatar' })
         </div>
         <div class="auth-field">
           <label for="password">Nouveau mot de passe</label>

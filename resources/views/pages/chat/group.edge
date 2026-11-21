@@ -18,86 +18,75 @@
       </div>
     </header>
 
-    <form class="chat-group-form" action="{{ route('groups.store') }}" method="post" enctype="multipart/form-data">
+    <form id="group-search" class="chat-search chat-search--panel" action="{{ route('groups.create') }}" method="get">
+      <input type="hidden" name="name" value="{{ name }}" class="js-name-copy" />
+      <input type="search" name="q" value="{{ query }}" placeholder="Rechercher une personne…" aria-label="Rechercher une personne" />
+    </form>
+
+    <form id="group-create" class="chat-group-form" action="{{ route('groups.store') }}" method="post">
       {{ csrfField() }}
-      @each(member in selected)
-        <input type="hidden" name="members" value="{{ member.id }}" />
-      @end
       <div class="auth-field">
         <label for="name">Nom du groupe</label>
         <input id="name" name="name" type="text" value="{{ old('name') || name }}" required maxlength="255" />
         @!kadea.fieldError({ name: 'name' })
         @!kadea.fieldError({ name: 'members' })
       </div>
-      <div class="auth-field">
-        <label for="avatar">Photo, optionnelle</label>
-        <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
-      </div>
-      <button type="submit" class="btn-primary auth-submit">Créer le groupe</button>
-    </form>
 
-    <div class="chat-messages">
       @if(flashMessages?.has('error'))
-        <div class="auth-message auth-message--error chat-flash" role="alert">{{ flashMessages.get('error') }}</div>
+        <div class="auth-message auth-message--error" role="alert">{{ flashMessages.get('error') }}</div>
       @end
 
       @each(member in selected)
-        <form class="chat-person js-keep-name" action="{{ route('groups.create') }}" method="get">
-          <input type="hidden" name="name" value="{{ name }}" class="js-name-copy" />
-          <input type="hidden" name="q" value="{{ query }}" />
-          @each(other in selected)
-            @if(other.id !== member.id)
-              <input type="hidden" name="members" value="{{ other.id }}" />
-            @end
-          @end
+        <label class="chat-person">
           <div class="chat-avatar" aria-hidden="true">{{ member.initials }}</div>
           <div class="chat-conv-meta">
             <span class="chat-conv-name">{{ member.fullName }}</span>
-            <p class="chat-conv-preview">Dans le groupe</p>
+            <p class="chat-conv-preview">{{ member.email }}</p>
           </div>
-          <button type="submit" class="chat-person-btn chat-person-btn--quiet">Retirer</button>
-        </form>
+          <input class="chat-person-check" type="checkbox" name="members" value="{{ member.id }}" checked aria-label="Ajouter {{ member.fullName }}" />
+        </label>
       @end
 
-      <form class="chat-search chat-search--panel js-keep-name" action="{{ route('groups.create') }}" method="get">
-        <input type="hidden" name="name" value="{{ name }}" class="js-name-copy" />
-        @each(member in selected)
-          <input type="hidden" name="members" value="{{ member.id }}" />
-        @end
-        <input type="search" name="q" value="{{ query }}" placeholder="Ajouter une personne…" aria-label="Ajouter une personne" />
-      </form>
-
       @each(person in people)
-        <form class="chat-person js-keep-name" action="{{ route('groups.create') }}" method="get">
-          <input type="hidden" name="name" value="{{ name }}" class="js-name-copy" />
-          <input type="hidden" name="q" value="{{ query }}" />
-          @each(member in selected)
-            <input type="hidden" name="members" value="{{ member.id }}" />
-          @end
-          <input type="hidden" name="members" value="{{ person.id }}" />
+        <label class="chat-person">
           <div class="chat-avatar" aria-hidden="true">{{ person.initials }}</div>
           <div class="chat-conv-meta">
             <span class="chat-conv-name">{{ person.fullName }}</span>
             <p class="chat-conv-preview">{{ person.email }}</p>
           </div>
-          <button type="submit" class="btn-primary chat-person-btn">Ajouter</button>
-        </form>
+          <input class="chat-person-check" type="checkbox" name="members" value="{{ person.id }}" aria-label="Ajouter {{ person.fullName }}" />
+        </label>
       @else
-        @if(query)
+        @if(query && !selected.length)
           <p class="chat-empty">Aucune personne trouvée.</p>
-        @else
-          <p class="chat-empty">Choisis au moins une autre personne. Le créateur devient admin.</p>
         @end
       @end
-    </div>
+
+      @if(!query && !selected.length)
+        <p class="chat-empty">Coche au moins une personne. Le créateur devient admin.</p>
+      @end
+
+      <button type="submit" class="btn-primary auth-submit">Ajouter</button>
+    </form>
   </section>
   <script>
-    document.querySelectorAll('.js-keep-name').forEach(function (form) {
-      form.addEventListener('submit', function () {
+    var searchForm = document.getElementById('group-search')
+    if (searchForm) {
+      searchForm.addEventListener('submit', function () {
         var source = document.getElementById('name')
-        var target = form.querySelector('.js-name-copy')
+        var target = searchForm.querySelector('.js-name-copy')
         if (source && target) target.value = source.value
+        searchForm.querySelectorAll('input[name="members"]').forEach(function (input) {
+          input.remove()
+        })
+        document.querySelectorAll('#group-create input[name="members"]:checked').forEach(function (box) {
+          var input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = 'members'
+          input.value = box.value
+          searchForm.appendChild(input)
+        })
       })
-    })
+    }
   </script>
 @end

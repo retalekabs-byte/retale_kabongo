@@ -1,11 +1,9 @@
-import { randomBytes } from 'node:crypto'
 import { DateTime } from 'luxon'
-import app from '@adonisjs/core/services/app'
 import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import User from '#models/user'
 import Conversations from '#services/conversations'
-import { createGroupValidator, memberIdValidator, searchUsersValidator } from '#validators/conversation'
+import { createGroupValidator, searchUsersValidator } from '#validators/conversation'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class GroupsController {
@@ -31,14 +29,11 @@ export default class GroupsController {
 
   async store({ request, response, session, auth }: HttpContext) {
     const user = auth.user!
-    const avatarFile = request.file('avatar')
-    const payload: { name: string; members: number[]; avatar?: typeof avatarFile } = {
-      name: request.input('name'),
-      members: this.idList(request.input('members')).filter((id) => id !== user.id),
-    }
-    if (avatarFile) payload.avatar = avatarFile
-    const { name, members: memberIds, avatar } = await request.validateUsing(createGroupValidator, {
-      data: payload,
+    const { name, members: memberIds } = await request.validateUsing(createGroupValidator, {
+      data: {
+        name: request.input('name'),
+        members: this.idList(request.input('members')).filter((id) => id !== user.id),
+      },
     })
     const others = memberIds.length
       ? await User.query().whereIn('id', memberIds).whereNotNull('emailVerifiedAt')
@@ -49,14 +44,7 @@ export default class GroupsController {
       return response.redirect().back()
     }
 
-    let avatarPath: string | null = null
-    if (avatar) {
-      const fileName = `${randomBytes(16).toString('hex')}.${avatar.extname}`
-      await avatar.move(app.publicPath('uploads/avatars'), { name: fileName })
-      avatarPath = `/uploads/avatars/${fileName}`
-    }
-
-    const conversation = await Conversations.createGroup(user, name, others, avatarPath)
+    const conversation = await Conversations.createGroup(user, name, others, null)
     return response.redirect().toRoute('chat.show', { id: conversation.id })
   }
 
@@ -82,25 +70,35 @@ export default class GroupsController {
       return response.redirect().toRoute('chat')
     }
 
-    const { userId } = await request.validateUsing(memberIdValidator)
-    const other = await User.query().where('id', userId).whereNotNull('emailVerifiedAt').first()
-    if (!other || other.id === user.id) {
-      session.flash('error', 'Cette personne est introuvable.')
-      return response.redirect().toRoute('groups.members', { id: conversation.id })
+    const ids = this.idList(request.input('members', request.input('userId'))).filter((id) => id !== user.id)
+    if (!ids.length) {
+      session.flash('error', 'Coche au moins une personne.')
+      return response.redirect().toRoute('chat.show', { id: conversation.id })
     }
 
-    const already = await Conversations.membership(conversation.id, other.id)
-    if (!already) {
+    const added: string[] = []
+    for (const id of ids) {
+      const other = await User.query().where('id', id).whereNotNull('emailVerifiedAt').first()
+      if (!other) continue
+      const already = await Conversations.membership(conversation.id, other.id)
+      if (already) continue
       await ConversationMember.create({
         conversationId: conversation.id,
         userId: other.id,
         role: 'member',
         joinedAt: DateTime.now(),
       })
+      added.push(other.fullName)
     }
 
-    session.flash('success', `${other.fullName} a rejoint le groupe.`)
-    return response.redirect().toRoute('groups.members', { id: conversation.id })
+    if (!added.length) {
+      session.flash('error', 'Ces personnes sont déjà dans le groupe.')
+    } else if (added.length === 1) {
+      session.flash('success', `${added[0]} a rejoint le groupe.`)
+    } else {
+      session.flash('success', 'Les personnes ont rejoint le groupe.')
+    }
+    return response.redirect().toRoute('chat.show', { id: conversation.id })
   }
 
   async remove({ auth, params, response, session }: HttpContext) {
@@ -115,13 +113,13 @@ export default class GroupsController {
     const targetId = Number(params.userId)
     if (targetId === user.id) {
       session.flash('error', 'Tu ne peux pas te retirer du groupe.')
-      return response.redirect().toRoute('groups.members', { id: conversation.id })
+      return response.redirect().toRoute('chat.show', { id: conversation.id })
     }
 
     const count = await ConversationMember.query().where('conversationId', conversation.id).count('* as total')
     if (Number(count[0].$extras.total) <= 2) {
       session.flash('error', 'Un groupe doit garder au moins deux membres.')
-      return response.redirect().toRoute('groups.members', { id: conversation.id })
+      return response.redirect().toRoute('chat.show', { id: conversation.id })
     }
 
     await ConversationMember.query()
@@ -129,7 +127,7 @@ export default class GroupsController {
       .where('userId', targetId)
       .delete()
 
-    return response.redirect().toRoute('groups.members', { id: conversation.id })
+    return response.redirect().toRoute('chat.show', { id: conversation.id })
   }
 
   private async renderMembers(

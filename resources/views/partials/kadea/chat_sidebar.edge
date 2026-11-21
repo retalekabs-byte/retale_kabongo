@@ -44,7 +44,7 @@
       <div hidden id="new-chat-csrf">{{ csrfField() }}</div>
     </div>
     <div id="new-group-pop" class="chat-pop" hidden data-people="{{ route('conversations.people') }}">
-      <form id="new-group-form" action="{{ route('groups.store') }}" method="post" enctype="multipart/form-data">
+      <form id="new-group-form" action="{{ route('groups.store') }}" method="post">
         {{ csrfField() }}
         <div class="chat-modal-head">
           <h2>Nouveau groupe</h2>
@@ -55,12 +55,10 @@
           </button>
         </div>
         <input id="new-group-name" name="name" type="text" placeholder="Nom du groupe" aria-label="Nom du groupe" required maxlength="255" />
-        <input id="new-group-avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="Photo du groupe" />
-        <input id="new-group-search" type="search" placeholder="Ajouter une personne…" aria-label="Ajouter une personne" />
-        <p id="new-group-hint" class="chat-pop-hint">Choisis au moins une autre personne.</p>
-        <div id="new-group-selected" class="chat-pop-selected"></div>
+        <input id="new-group-search" type="search" placeholder="Rechercher une personne…" aria-label="Rechercher une personne" />
+        <p id="new-group-hint" class="chat-pop-hint">Coche au moins une personne.</p>
         <div id="new-group-list" class="chat-modal-list"></div>
-        <button type="submit" class="btn-primary auth-submit">Créer le groupe</button>
+        <button type="submit" class="btn-primary auth-submit">Ajouter</button>
       </form>
     </div>
   </div>

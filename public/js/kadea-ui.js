@@ -175,7 +175,6 @@
   var groupForm = document.getElementById('new-group-form')
   var groupSearch = document.getElementById('new-group-search')
   var groupList = document.getElementById('new-group-list')
-  var groupSelected = document.getElementById('new-group-selected')
   var groupHint = document.getElementById('new-group-hint')
   var picked = []
   var lastPeople = []
@@ -183,24 +182,6 @@
   function personChosen(id) {
     return picked.some(function (person) {
       return person.id === id
-    })
-  }
-
-  function renderPicked() {
-    groupSelected.textContent = ''
-    picked.forEach(function (person) {
-      var chip = document.createElement('button')
-      chip.type = 'button'
-      chip.className = 'chat-pop-chip'
-      chip.textContent = person.fullName + ' ×'
-      chip.addEventListener('click', function () {
-        picked = picked.filter(function (item) {
-          return item.id !== person.id
-        })
-        renderPicked()
-        renderGroupPeople(lastPeople)
-      })
-      groupSelected.appendChild(chip)
     })
   }
 
@@ -215,7 +196,7 @@
       return
     }
     people.forEach(function (person) {
-      var row = document.createElement('div')
+      var row = document.createElement('label')
       row.className = 'chat-person'
       var avatar = document.createElement('div')
       avatar.className = 'chat-avatar'
@@ -240,24 +221,22 @@
       meta.appendChild(name)
       meta.appendChild(preview)
       row.appendChild(meta)
-      var button = document.createElement('button')
-      button.type = 'button'
-      var chosen = personChosen(person.id)
-      button.className = chosen ? 'chat-person-btn chat-person-btn--quiet' : 'btn-primary chat-person-btn'
-      button.textContent = chosen ? 'Retirer' : 'Ajouter'
-      button.addEventListener('click', function () {
-        if (personChosen(person.id)) {
+      var checkbox = document.createElement('input')
+      checkbox.type = 'checkbox'
+      checkbox.className = 'chat-person-check'
+      checkbox.checked = personChosen(person.id)
+      checkbox.setAttribute('aria-label', 'Ajouter ' + person.fullName)
+      checkbox.addEventListener('change', function () {
+        if (checkbox.checked) {
+          if (!personChosen(person.id)) picked.push(person)
+        } else {
           picked = picked.filter(function (item) {
             return item.id !== person.id
           })
-        } else {
-          picked.push(person)
         }
         if (groupHint) groupHint.classList.remove('is-error')
-        renderPicked()
-        renderGroupPeople(lastPeople)
       })
-      row.appendChild(button)
+      row.appendChild(checkbox)
       groupList.appendChild(row)
     })
   }
@@ -286,7 +265,6 @@
       groupPop.hidden = !groupPop.hidden
       if (!groupPop.hidden) {
         picked = []
-        renderPicked()
         if (groupSearch) groupSearch.value = ''
         if (groupHint) groupHint.classList.remove('is-error')
         loadGroupPeople('')
@@ -335,6 +313,140 @@
         groupForm.appendChild(input)
       })
     })
+  }
+
+  var groupInfoBtn = document.getElementById('btn-group-info')
+  var groupInfoPop = document.getElementById('group-info-pop')
+  var groupAddForm = document.getElementById('group-add-form')
+  var groupAddSearch = document.getElementById('group-add-search')
+  var groupAddList = document.getElementById('group-add-list')
+  var groupAddHint = document.getElementById('group-add-hint')
+  var groupAddPicked = []
+  var groupMemberIds = groupInfoPop
+    ? (groupInfoPop.getAttribute('data-members') || '').split(',').filter(Boolean)
+    : []
+
+  function renderGroupAdd(people) {
+    if (!groupAddList) return
+    groupAddList.textContent = ''
+    var available = people.filter(function (person) {
+      return groupMemberIds.indexOf(String(person.id)) === -1
+    })
+    if (!available.length) {
+      var empty = document.createElement('p')
+      empty.className = 'chat-empty'
+      empty.textContent = 'Aucune personne à ajouter.'
+      groupAddList.appendChild(empty)
+      return
+    }
+    available.forEach(function (person) {
+      var row = document.createElement('label')
+      row.className = 'chat-person'
+      var avatar = document.createElement('div')
+      avatar.className = 'chat-avatar'
+      avatar.textContent = person.initials
+      row.appendChild(avatar)
+      var meta = document.createElement('div')
+      meta.className = 'chat-conv-meta'
+      var name = document.createElement('span')
+      name.className = 'chat-conv-name'
+      name.textContent = person.fullName
+      var preview = document.createElement('p')
+      preview.className = 'chat-conv-preview'
+      preview.textContent = person.email
+      meta.appendChild(name)
+      meta.appendChild(preview)
+      row.appendChild(meta)
+      var checkbox = document.createElement('input')
+      checkbox.type = 'checkbox'
+      checkbox.className = 'chat-person-check'
+      checkbox.checked = groupAddPicked.indexOf(String(person.id)) !== -1
+      checkbox.setAttribute('aria-label', 'Ajouter ' + person.fullName)
+      checkbox.addEventListener('change', function () {
+        var id = String(person.id)
+        if (checkbox.checked) {
+          if (groupAddPicked.indexOf(id) === -1) groupAddPicked.push(id)
+        } else {
+          groupAddPicked = groupAddPicked.filter(function (item) {
+            return item !== id
+          })
+        }
+        if (groupAddHint) groupAddHint.classList.remove('is-error')
+      })
+      row.appendChild(checkbox)
+      groupAddList.appendChild(row)
+    })
+  }
+
+  function loadGroupAdd(query) {
+    if (!groupInfoPop || !groupAddList) return
+    var url = groupInfoPop.getAttribute('data-people') + '?q=' + encodeURIComponent(query || '')
+    groupAddList.textContent = 'Chargement…'
+    fetch(url, { headers: { accept: 'application/json' }, credentials: 'same-origin' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('load')
+        return res.json()
+      })
+      .then(renderGroupAdd)
+      .catch(function () {
+        groupAddList.textContent = ''
+        var error = document.createElement('p')
+        error.className = 'chat-empty'
+        error.textContent = 'Impossible de charger les personnes.'
+        groupAddList.appendChild(error)
+      })
+  }
+
+  if (groupInfoBtn && groupInfoPop) {
+    groupInfoBtn.addEventListener('click', function () {
+      groupInfoPop.hidden = !groupInfoPop.hidden
+      if (!groupInfoPop.hidden && groupAddList) {
+        groupAddPicked = []
+        if (groupAddSearch) groupAddSearch.value = ''
+        if (groupAddHint) groupAddHint.classList.remove('is-error')
+        loadGroupAdd('')
+      }
+    })
+    document.addEventListener('click', function (event) {
+      if (groupInfoPop.hidden) return
+      if (groupInfoPop.contains(event.target) || groupInfoBtn.contains(event.target)) return
+      groupInfoPop.hidden = true
+    })
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') groupInfoPop.hidden = true
+    })
+    if (groupAddSearch) {
+      var addTimer
+      groupAddSearch.addEventListener('input', function () {
+        window.clearTimeout(addTimer)
+        var value = groupAddSearch.value
+        addTimer = window.setTimeout(function () {
+          loadGroupAdd(value)
+        }, 200)
+      })
+      groupAddSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') event.preventDefault()
+      })
+    }
+    if (groupAddForm) {
+      groupAddForm.addEventListener('submit', function (event) {
+        if (!groupAddPicked.length) {
+          event.preventDefault()
+          if (groupAddHint) groupAddHint.classList.add('is-error')
+          return
+        }
+        groupAddForm.querySelectorAll('input[name="members"]').forEach(function (input) {
+          input.remove()
+        })
+        groupAddPicked.forEach(function (id) {
+          var input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = 'members'
+          input.value = id
+          groupAddForm.appendChild(input)
+        })
+      })
+    }
   }
 
   var peerInfoBtn = document.getElementById('btn-peer-info')
